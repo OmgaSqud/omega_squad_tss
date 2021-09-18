@@ -1,0 +1,7 @@
+.img-fluid {
+    padding: 0;
+    margin: 0;
+    max-height: 40px;
+    max-width: 100%;
+    height: auto;
+  }

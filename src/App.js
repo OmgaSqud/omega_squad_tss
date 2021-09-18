@@ -1,13 +1,19 @@
-import { Route, Switch } from "react-router-dom";
+import React from "react";
+import { Switch } from "react-router-dom";
 import "./App.css";
-import Layout from "./components/Layout";
+import Navbar from "./shared/Navbar";
 
-function App() {
+const App = () => {
   return (
-    <Layout>
-      <Switch>{/* <Route path="" component /> */}</Switch>
-    </Layout>
+    <>
+      <Navbar />
+      <Switch>
+        {/* <Route exact path="/">
+          <Homepage />
+        </Route> */}
+      </Switch>
+    </>
   );
-}
+};
 
 export default App;
