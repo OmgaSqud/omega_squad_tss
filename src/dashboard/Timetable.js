@@ -1,23 +1,24 @@
 import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import { useState, useEffect } from "react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import MuiAppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import { styled, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/Firebase";
+import SubjectCard from "./SubjectCard";
+import CardColorFilter from "../utilities/CardColorFilter";
 
 const Timetable = () => {
+  const [subjects, setSubjects] = useState([]);
+
   const drawerWidth = 240;
 
   const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -75,6 +76,23 @@ const Timetable = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const fetchSubjects = async () => {
+    const docRef = doc(db, "users", "kzo1LcZvI84BgZfHkkQK");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setSubjects(docSnap.data().subjects);
+      console.log("Document data:", docSnap.data());
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+  };
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
+
   return (
     <Box style={{ backgroundColor: "#D2DBEB", height: "90vh" }}>
       <Box sx={{ display: "flex" }}>
@@ -94,13 +112,7 @@ const Timetable = () => {
             >
               <ChevronRightIcon />
             </IconButton>
-            <Typography
-              variant="h5"
-              noWrap
-              component="div"
-              fontWeight="bold"
-              textAlign={"center"}
-            >
+            <Typography variant="h4" noWrap component="div" fontWeight="bold">
               My Timetable
             </Typography>
           </Toolbar>
@@ -122,7 +134,7 @@ const Timetable = () => {
         >
           <DrawerHeader>
             <Typography
-              sx={{ color: "white", fontSize: 20, textAlign: "center" }}
+              sx={{ color: "white", fontSize: 22, textAlign: "center" }}
             >
               {" "}
               Select Subject{" "}
@@ -135,37 +147,15 @@ const Timetable = () => {
               )}
             </IconButton>
           </DrawerHeader>
-          <Divider />
-          <Box
-            sx={{
-              fontSize: 16,
-              backgroundColor: "red",
-              padding: "10%",
-              textAlign: "center",
-            }}
-          >
-            Com.Maths
-          </Box>
-          <Box
-            sx={{
-              fontSize: 16,
-              backgroundColor: "green",
-              padding: "10%",
-              textAlign: "center",
-            }}
-          >
-            Biology
-          </Box>
-          {/* <List>
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
+          <Divider sx={{ backgroundColor: "black" }} />
+          <Box style={{ marginTop: 10, alignSelf: "center" }}>
+            {subjects.map((subject, index) => (
+              <SubjectCard
+                subject={subject}
+                bgcolor={CardColorFilter(subject)}
+              />
             ))}
-          </List> */}
+          </Box>
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
