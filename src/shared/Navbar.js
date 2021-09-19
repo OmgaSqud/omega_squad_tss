@@ -5,8 +5,10 @@ import Tabs from "@mui/material/Tabs";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { useHistory } from "react-router";
 
 const Navbar = () => {
+  const history = useHistory();
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -51,8 +53,11 @@ const Navbar = () => {
               onChange={handleChange}
               aria-label="nav tabs example"
             >
-              <LinkTab label="Home" href="/Home" />
-              <LinkTab label="About" href="/About" />
+              <LinkTab label="Home" onClick={() => history.push("/")} />
+              <LinkTab
+                label="About"
+                onClick={() => history.push("/student-view")}
+              />
               <LinkTab label="Contact" href="/Contact" />
             </Tabs>
           </Box>
