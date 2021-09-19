@@ -1,6 +1,8 @@
 import React from "react";
-import { Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import "./App.css";
+//import Footer from "./shared/Footer";
+import Timetable from "./dashboard/Timetable";
 import Navbar from "./shared/Navbar";
 
 const App = () => {
@@ -8,10 +10,11 @@ const App = () => {
     <>
       <Navbar />
       <Switch>
-        {/* <Route exact path="/">
-          <Homepage />
-        </Route> */}
+        <Route exact path="/">
+          <Timetable />
+        </Route>
       </Switch>
+      {/* <Footer /> */}
     </>
   );
 };
