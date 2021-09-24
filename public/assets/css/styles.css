@@ -14,3 +14,9 @@
   justify-content: center !important;
   align-items: center !important; */
 }
+
+.selectBar {
+  background-color: white;
+  width: 80%;
+  margin: 30px auto;
+}
