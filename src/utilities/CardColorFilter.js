@@ -14,6 +14,9 @@ function CardColorFilter(subject) {
     case "Chemistry":
       bgcolor = "#5174FF";
       break;
+    case "English":
+      bgcolor = "#F540F5";
+      break;
     default:
   }
   return bgcolor;
