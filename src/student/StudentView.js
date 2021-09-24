@@ -241,7 +241,7 @@ const StudentView = () => {
     >
       <Box textAlign="center">
         <Typography variant="h4" gutterBottom component="div">
-          My Shedule
+          My Schedule
         </Typography>
       </Box>
 
