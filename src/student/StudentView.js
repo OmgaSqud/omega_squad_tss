@@ -1,6 +1,9 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
@@ -9,32 +12,36 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import LastPageIcon from "@mui/icons-material/LastPage";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+import { db } from "../firebase/Firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const StudentView = () => {
-  function createData(name, time, subject, teacher, protein, price) {
+  //----------------------------------------------------Table----------------------------------------------------
+  const [rows, setRows] = useState([]);
+
+  const today = "Monday";
+
+  function createData(date, time, subject, teacher, link) {
     return {
-      name,
+      date,
       time,
       subject,
       teacher,
-      protein,
-      price,
-      link: [
-        {
-          date: "2020-01-05",
-          customerId: "11091700",
-          amount: 3,
-        },
-        {
-          date: "2020-01-02",
-          customerId: "Anonymous",
-          amount: 1,
-        },
-      ],
+      link,
     };
   }
 
@@ -55,7 +62,7 @@ const StudentView = () => {
             </IconButton>
           </TableCell>
           <TableCell component="th" scope="row">
-            {row.name}
+            {row.date}
           </TableCell>
           <TableCell align="right">{row.time}</TableCell>
           <TableCell align="right">{row.subject}</TableCell>
@@ -68,33 +75,7 @@ const StudentView = () => {
                 <Typography variant="h6" gutterBottom component="div">
                   link
                 </Typography>
-                {/* <Table size="small" aria-label="purchases">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Customer</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                      <TableCell align="right">Total price ($)</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {row.link.map((linkRow) => (
-                      <TableRow key={linkRow.date}>
-                        <TableCell component="th" scope="row">
-                          {linkRow.date}
-                        </TableCell>
-                        <TableCell>{linkRow.customerId}</TableCell>
-                        <TableCell align="right">
-                          {linkRow.amount}
-                        </TableCell>
-                        <TableCell align="right">
-                          {Math.round(linkRow.amount * row.price * 100) /
-                            100}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table> */}
+
                 <Typography
                   variant="h8"
                   color="blue"
@@ -102,7 +83,7 @@ const StudentView = () => {
                   gutterBottom
                   component="div"
                 >
-                  https://zoom.us/j/68186350212?pwd=NVF4NWt3Vnl3ZTlkb0l2NE5EbUlrUT09#success
+                  {row.link}
                 </Typography>
               </Box>
             </Collapse>
@@ -117,28 +98,138 @@ const StudentView = () => {
       time: PropTypes.string.isRequired,
       teacher: PropTypes.string.isRequired,
       subject: PropTypes.string.isRequired,
-      link: PropTypes.arrayOf(
-        PropTypes.shape({
-          amount: PropTypes.number.isRequired,
-          customerId: PropTypes.string.isRequired,
-          date: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-      name: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
-      protein: PropTypes.number.isRequired,
+      link: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
     }).isRequired,
   };
+  //-------------------------------------------------------------------------------------------------------------------
 
-  const rows = [
-    createData("10/09/2021", "9.00 A.M", "Physics", "Mr. K.T. Rathnayake"),
-    createData("10/09/2021", "10.40 A.M", "Com.Maths", "Mr. S.S. Dissanayake"),
-    createData("10/09/2021", "12.00 P.M", "English", "Mrs. N. Rajapakse"),
-    createData("11/09/2021", "8.20 A.M", "Chemistry", "Mrs. H.L.B. Herath"),
-    createData("11/09/2021", "9.00 A.M", "Com.Maths", "Mr. K.T. Rathnayake"),
-  ];
+  //-----------------------------------------------------Pagination----------------------------------------------------
+  function TablePaginationActions(props) {
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
 
-  // /*export default function CollapsibleTable() {*/
+    const handleFirstPageButtonClick = (event) => {
+      onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event) => {
+      onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+      onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event) => {
+      onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    return (
+      <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+        <IconButton
+          onClick={handleFirstPageButtonClick}
+          disabled={page === 0}
+          aria-label="first page"
+        >
+          {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+        </IconButton>
+        <IconButton
+          onClick={handleBackButtonClick}
+          disabled={page === 0}
+          aria-label="previous page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowRight />
+          ) : (
+            <KeyboardArrowLeft />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleNextButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="next page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowLeft />
+          ) : (
+            <KeyboardArrowRight />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleLastPageButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="last page"
+        >
+          {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+        </IconButton>
+      </Box>
+    );
+  }
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(2);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  TablePaginationActions.propTypes = {
+    count: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
+  };
+  //------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------Select Bar------------------------------------------------
+  const [filter, setFilter] = React.useState("today");
+
+  const handleChange = (event) => {
+    setFilter(event.target.value);
+  };
+  //------------------------------------------------------------------------------------------------------------------
+
+  //-------------------------------------------------------Functions and Queries--------------------------------------
+
+  const fetchDetails = async () => {
+    let q;
+    if (filter === "today") {
+      q = query(
+        collection(db, "timeslots"),
+        where("class", "==", "13-A"),
+        where("day", "==", today)
+      );
+    } else {
+      q = query(collection(db, "timeslots"), where("class", "==", "13-A"));
+    }
+
+    const querySnapshot = await getDocs(q);
+    let array = [];
+    querySnapshot.forEach((doc) => {
+      let data = doc.data();
+      // doc.data() is never undefined for query doc snapshots
+
+      array.push(
+        createData(data.day, data.period, data.subject, data.teacher, data.link)
+      );
+    });
+
+    setRows(array);
+  };
+
+  useEffect(() => {
+    fetchDetails();
+  }, [filter]);
+
+  //----------------------------------------------------------------------------------------------------------------
+
+  //-----------------------------------------------------------Render-----------------------------------------------
   return (
     <Box
       sx={{
@@ -153,6 +244,23 @@ const StudentView = () => {
           My Shedule
         </Typography>
       </Box>
+
+      <Box sx={{ minWidth: 120 }} class="selectBar">
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={filter}
+            label="filter"
+            onChange={handleChange}
+          >
+            <MenuItem value={"today"}>Today</MenuItem>
+            <MenuItem value={"this week"}>This Week</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
       <TableContainer component={Paper} class="container">
         <Table aria-label="collapsible table">
           <TableHead style={{ backgroundColor: "#343A40" }}>
@@ -168,16 +276,37 @@ const StudentView = () => {
               <TableCell align="right" style={{ color: "white" }}>
                 Teacher
               </TableCell>
-              {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
+              {/* <TableCell align="right">nbsp;(g)</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <Row key={row.name} row={row} />
+            {(rowsPerPage > 0
+              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : rows
+            ).map((row) => (
+              <Row key={row.date} row={row} />
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          rowsPerPageOptions={[2, 5]}
+          count={rows.length}
+          onPageChange={handleChangePage}
+          ActionsComponent={TablePaginationActions}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </TableContainer>
+      <Stack spacing={2} direction="row">
+        <Button
+          variant="contained"
+          sx={{ margin: "auto", marginTop: "20px" }}
+          onClick={() => console.log(rows, filter)}
+        >
+          Test
+        </Button>
+      </Stack>
     </Box>
   );
 };
