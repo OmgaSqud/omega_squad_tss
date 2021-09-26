@@ -23,7 +23,10 @@ import { collection, query, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
 import SubjectCard from "./SubjectCard";
 import CardColorFilter from "../utilities/CardColorFilter";
-import DaysMapper from "../utilities/DaysMapper";
+import { DaysMapper } from "../utilities/DaysHandler";
+import { DayRetriever } from "../utilities/DaysHandler";
+import TimeslotModal from "../modals/TimeslotModal";
+import ConfirmModal from "../modals/ConfirmModal";
 
 const Timetable = () => {
   const Item = styled(Paper)(({ theme }) => ({
@@ -41,19 +44,26 @@ const Timetable = () => {
     "FRIDAY",
   ];
   const timeperiods = [
-    "07:50-08:30",
-    "08:30-09:10",
-    "09:10-09:50",
-    "09:50-10:30",
-    "INTERVAL",
-    "10:50-11:30",
-    "11:30-12:10",
-    "12:10-12:50",
-    "12:50-01:30",
+    "07:50 AM - 08:30 AM",
+    "08:30 AM - 09:10 AM",
+    "09:10 AM - 09:50 AM",
+    "09:50 AM - 10:30 AM",
+    "10:30 AM - 10:50 AM",
+    "10:50 AM - 11:30 AM",
+    "11:30 AM - 12:10 PM",
+    "12:10 PM - 12:50 PM",
+    "12:50 PM - 01:30 PM",
   ];
 
   const [subjects, setSubjects] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
+  const [slotSubject, setSlotSubject] = useState();
+  const [slotDay, setSlotDay] = useState();
+  const [slotPeriod, setSlotPeriod] = useState();
+
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [saveData, setSaveData] = useState(false);
 
   const drawerWidth = 240;
 
@@ -112,8 +122,59 @@ const Timetable = () => {
     setOpen(false);
   };
 
+  const onDrag = (subject) => {
+    setSlotSubject(subject);
+  };
+
+  const onDragOver = (event, i, Period) => {
+    event.preventDefault();
+    setSlotDay(DayRetriever(i));
+    setSlotPeriod(Period);
+  };
+
+  const onDrop = (event) => {
+    event.preventDefault();
+    console.log(slotSubject + " added to " + slotDay + " Period " + slotPeriod);
+    setOpenModal(true);
+  };
+
+  const saveSlotData = (Grade, Class) => {
+    if (Grade && Class) {
+      alert(
+        slotSubject +
+          " added to " +
+          slotDay +
+          " Period " +
+          slotPeriod +
+          " of Class " +
+          Grade +
+          "-" +
+          Class +
+          " where startTime is " +
+          timeperiods[slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod].split(
+            slotPeriod < 7 ? "AM" : "PM"
+          )[0]
+      );
+      //save data to firestore
+      setOpenModal(false);
+      setSaveData(!saveData);
+    } else alert("Select  Grade & Class to save details");
+  };
+
+  const ZoomAPI = () => {
+    //generate zoom link
+    setOpenModal2(false);
+    setOpenModal(false);
+  };
+
+  const viewPeriodDetails = (Class) => {
+    //view period details
+    console.log(Class);
+    setOpenModal(true);
+  };
+
   const fetchSubjects = async () => {
-    const docRef = doc(db, "users", "kzo1LcZvI84BgZfHkkQK");
+    const docRef = doc(db, "users", "XnH9lDsLsEWqda1B1D2ScYxGu822");
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -131,6 +192,7 @@ const Timetable = () => {
     querySnapshot.forEach((doc) => {
       let data = doc.data();
       arr.push({
+        id: doc.id,
         class: data.class,
         day: data.day,
         period: data.period,
@@ -140,13 +202,13 @@ const Timetable = () => {
     arr = arr.sort(function (a, b) {
       return DaysMapper(a.day) - DaysMapper(b.day);
     });
-    setTimeslots(arr);
-    console.log(timeslots);
+    setTimeslots(arr, console.log(timeslots));
   };
 
   const SlotMapper = (Period) => {
     let row = [];
     let value = [];
+    let Class;
     for (let i = 0; i < 5; i++) {
       value = timeslots.find(
         (element) => DaysMapper(element.day) === i && element.period == Period
@@ -154,23 +216,52 @@ const Timetable = () => {
       row.push(
         <TableCell
           align="center"
-          sx={{ backgroundColor: !Period ? "#8CD4CD" : null }}
+          sx={{
+            backgroundColor: !Period ? "#8CD4CD" : null,
+            width: 150,
+            fontSize: 20,
+            fontWeight: "bold",
+            fontStyle: i === 2 && !Period ? "italic" : null,
+          }}
         >
           {value ? (
-            // <SubjectCard
-            //   subject={value.subject+"\n"+value.class}
-            //   bgcolor={CardColorFilter(value.subject)}
-            // />
-            <Grid item xs={2} sm={4} md={4} columns={1}>
-              <Item
-                sx={{
-                  backgroundColor: CardColorFilter(value.subject),
-                }}
+            ((Class = value.class),
+            (
+              <Grid
+                item
+                alignSelf={"center"}
+                // eslint-disable-next-line no-loop-func
+                onClick={() => viewPeriodDetails(Class)}
               >
-                {value.subject + "\n" + value.class}
-              </Item>
-            </Grid>
-          ) : null}
+                <Item
+                  sx={{
+                    backgroundColor: CardColorFilter(value.subject),
+                    height: 50,
+                  }}
+                >
+                  <Typography>{value.subject + "  " + value.class}</Typography>
+                </Item>
+              </Grid>
+            ))
+          ) : Period ? (
+            <div
+              onDrop={(event) => onDrop(event)}
+              onDragOver={(event) => onDragOver(event, i, Period)}
+            >
+              <Grid item alignSelf={"center"}>
+                <Item
+                  sx={{
+                    backgroundColor: "#DBE0DF",
+                    height: 45,
+                  }}
+                >
+                  <Typography></Typography>
+                </Item>
+              </Grid>
+            </div>
+          ) : (
+            i === 2 && "INTERVAL"
+          )}
         </TableCell>
       );
     }
@@ -180,7 +271,7 @@ const Timetable = () => {
   useEffect(() => {
     fetchSubjects();
     fetchTimeslots();
-  }, []);
+  }, [saveData]);
 
   return (
     <Box style={{ backgroundColor: "#D2DBEB", height: "100%" }}>
@@ -189,7 +280,7 @@ const Timetable = () => {
         <AppBar
           position="absolute"
           open={open}
-          sx={{ top: "10vh", backgroundColor: "#8D9F98", color: "black" }}
+          sx={{ top: "10vh", backgroundColor: "#b6c1bf", color: "black" }}
         >
           <Toolbar>
             <IconButton
@@ -211,25 +302,24 @@ const Timetable = () => {
             width: drawerWidth,
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              position: "absolute",
+              position: "sticky",
               top: "10vh",
               width: drawerWidth,
               boxSizing: "border-box",
-              backgroundColor: "#8D9F98",
+              backgroundColor: "#34495e",
             },
           }}
           variant="persistent"
           anchor="left"
           open={open}
         >
-          <DrawerHeader>
+          <DrawerHeader sx={{ justifyContent: "space-between" }}>
             <Typography
-              sx={{ color: "white", fontSize: 22, textAlign: "center" }}
+              sx={{ color: "white", fontSize: 22, marginLeft: "30%" }}
             >
-              {" "}
-              Select Subject{" "}
+              Subjects
             </Typography>
-            <IconButton onClick={handleDrawerClose}>
+            <IconButton onClick={handleDrawerClose} sx={{ color: "white" }}>
               {theme.direction === "ltr" ? (
                 <ChevronLeftIcon />
               ) : (
@@ -237,26 +327,33 @@ const Timetable = () => {
               )}
             </IconButton>
           </DrawerHeader>
-          <Divider sx={{ backgroundColor: "black" }} />
+          <Divider sx={{ backgroundColor: "white" }} />
           <Box style={{ marginTop: 10, alignSelf: "center" }}>
             {subjects.map((subject, index) => (
-              <SubjectCard
-                subject={subject}
-                bgcolor={CardColorFilter(subject)}
-              />
+              <div draggable={true} onDragStart={() => onDrag(subject)}>
+                <SubjectCard
+                  subject={subject}
+                  bgcolor={CardColorFilter(subject)}
+                />
+              </div>
             ))}
           </Box>
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
           <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
                   {Headers.map((heading) => (
                     <TableCell
                       align="center"
-                      sx={{ fontWeight: "bold", backgroundColor: "#8CD4CD" }}
+                      sx={{
+                        fontSize: 20,
+                        fontWeight: "bold",
+                        backgroundColor: "#8CD4CD",
+                        width: 150,
+                      }}
                     >
                       {heading}
                     </TableCell>
@@ -268,12 +365,15 @@ const Timetable = () => {
                   <TableRow>
                     <TableCell
                       align="center"
-                      sx={{ fontWeight: "bold", backgroundColor: "#8CD4CD" }}
+                      sx={{
+                        fontWeight: "bold",
+                        backgroundColor: "#8CD4CD",
+                      }}
                     >
                       {slot}
                     </TableCell>
                     {SlotMapper(
-                      slot === "INTERVAL" ? null : index < 4 ? index + 1 : index
+                      index === 4 ? null : index < 4 ? index + 1 : index
                     )}
                   </TableRow>
                 ))}
@@ -281,6 +381,17 @@ const Timetable = () => {
             </Table>
           </TableContainer>
         </Main>
+        <TimeslotModal
+          value={openModal}
+          backdrop={() => setOpenModal(false)}
+          save={(Grade, Class) => saveSlotData(Grade, Class)}
+          generate={() => setOpenModal2(true)}
+        />
+        <ConfirmModal
+          value={openModal2}
+          back={() => setOpenModal2(false)}
+          zoom={() => ZoomAPI()}
+        />
       </Box>
     </Box>
   );
