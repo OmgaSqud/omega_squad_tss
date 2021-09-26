@@ -18,10 +18,25 @@
   height: auto;
 }
 
+
 section {
   padding: 60px 0;
   overflow: hidden;
 }
 #hero .container {
   padding-top: 72px;
+  
+  .container {
+  background-color: white;
+  width: 80%;
+  margin: auto;
+  /* display: block !important;
+  justify-content: center !important;
+  align-items: center !important; */
 }
+
+.selectBar {
+  background-color: white;
+  width: 80%;
+  margin: 30px auto;
+
