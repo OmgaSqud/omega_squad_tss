@@ -60,7 +60,7 @@ const Navbar = () => {
               />
               <LinkTab
                 label="Contact"
-                onClick={() => history.push("/timetable")}
+                onClick={() => history.push("/dashboard")}
               />
             </Tabs>
           </Box>

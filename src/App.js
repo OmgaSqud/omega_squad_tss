@@ -2,10 +2,13 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
 //import Footer from "./shared/Footer";
+
 import Timetable from "./dashboard/Timetable";
 import Homepage from "./home/Homepage";
 import Navbar from "./shared/Navbar";
 import StudentView from "./student/StudentView";
+import Navbar from "./shared/Navbar";
+
 
 const App = () => {
   return (
@@ -15,7 +18,6 @@ const App = () => {
         <Route exact path="/">
           <Homepage />
         </Route>
-
         <Route exact path="/dashboard">
           <Timetable />
         </Route>
