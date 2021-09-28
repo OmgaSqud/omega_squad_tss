@@ -3,14 +3,9 @@ import { Route, Switch } from "react-router-dom";
 import "./App.css";
 //import Footer from "./shared/Footer";
 import Timetable from "./dashboard/Timetable";
-import Navbar from "./shared/Navbar";
-
 import Homepage from "./home/Homepage";
-import { Route } from "react-router";
+import Navbar from "./shared/Navbar";
 import StudentView from "./student/StudentView";
-import Timetable from "./dashboard/Timetable";
-import StudentView from "./student/StudentView";
-
 
 const App = () => {
   return (
@@ -18,20 +13,15 @@ const App = () => {
       <Navbar />
       <Switch>
         <Route exact path="/">
-
           <Homepage />
         </Route>
 
-        <Route exact path="/student">
-          <StudentView />
-        </Route>
         <Route exact path="/dashboard">
           <Timetable />
         </Route>
-    <Route exact path="/student-view">
+        <Route exact path="/student">
           <StudentView />
         </Route>
-
       </Switch>
       {/* <Footer /> */}
     </>

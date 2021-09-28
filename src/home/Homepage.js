@@ -57,7 +57,7 @@ const HomePage = () => {
             case "student":
               history.push("/student");
               break;
-            case "Teacher":
+            case "teacher":
               history.push("/dashboard");
               break;
             case "admin":
