@@ -26,10 +26,14 @@ import Typography from "@mui/material/Typography";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import PropTypes from "prop-types";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { db } from "../firebase/Firebase";
+import { AuthContext } from "../firebase/AuthContext";
 
 const StudentView = () => {
+  const user = useContext(AuthContext);
+  const userDetails = user.user.userDetails;
+
   //----------------------------------------------------Table----------------------------------------------------
   const [rows, setRows] = useState([]);
 
@@ -308,7 +312,7 @@ const StudentView = () => {
         <Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => console.log(rows, filter)}
+          onClick={() => console.log(rows, filter, userDetails.name)}
         >
           Test
         </Button>

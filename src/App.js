@@ -7,8 +7,6 @@ import Timetable from "./dashboard/Timetable";
 import Homepage from "./home/Homepage";
 import Navbar from "./shared/Navbar";
 import StudentView from "./student/StudentView";
-import Navbar from "./shared/Navbar";
-
 
 const App = () => {
   return (

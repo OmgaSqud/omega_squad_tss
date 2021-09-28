@@ -5,6 +5,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
+import { AuthProvider } from "./firebase/AuthContext";
 import reportWebVitals from "./reportWebVitals";
 
 const theme = createTheme({});
@@ -14,7 +15,9 @@ ReactDOM.render(
     <CssBaseline />
     <ThemeProvider theme={theme}>
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>,
