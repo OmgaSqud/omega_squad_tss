@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MuiAppBar from "@mui/material/AppBar";
@@ -22,6 +22,7 @@ import Grid from "@mui/material/Grid";
 import {
   collection,
   query,
+  where,
   getDocs,
   doc,
   getDoc,
@@ -30,6 +31,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
+import { AuthContext } from "../firebase/AuthContext";
 import SubjectCard from "./SubjectCard";
 import CardColorFilter from "../utilities/CardColorFilter";
 import { DaysMapper } from "../utilities/DaysHandler";
@@ -38,6 +40,12 @@ import TimeslotModal from "../modals/TimeslotModal";
 import ConfirmModal from "../modals/ConfirmModal";
 
 const Timetable = () => {
+  // const user = useContext(AuthContext).user.userDetails;
+  const user = {
+    uid: "XnH9lDsLsEWqda1B1D2ScYxGu822",
+    name: "Vinura Chandrasekara",
+    email: "vinurachan@gmail.com",
+  };
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(2),
@@ -177,7 +185,7 @@ const Timetable = () => {
         period: period,
         startTime: StartTime,
         subject: slotSubject,
-        teacher: "Vinura Chandrasekara",
+        teacher: user.name,
       });
       setOpenModal(false);
       setSaveData(!saveData);
@@ -205,7 +213,13 @@ const Timetable = () => {
     setOpenModal(false);
   };
 
-  const viewPeriodDetails = (Class, id) => {
+  const viewPeriodDetails = (i, Period) => {
+    let id = timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).id;
+    let Class = timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).class;
     setUpdateslot(true);
     setslotID(id);
     setGrade(Class.split("-")[0]);
@@ -214,7 +228,7 @@ const Timetable = () => {
   };
 
   const fetchSubjects = async () => {
-    const docRef = doc(db, "users", "XnH9lDsLsEWqda1B1D2ScYxGu822");
+    const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -226,7 +240,10 @@ const Timetable = () => {
   };
 
   const fetchTimeslots = async () => {
-    const q = query(collection(db, "timeslots"));
+    const q = query(
+      collection(db, "timeslots"),
+      where("teacher", "==", user.name)
+    );
     let arr = [];
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -248,8 +265,6 @@ const Timetable = () => {
   const SlotMapper = (Period) => {
     let row = [];
     let value = [];
-    let Class;
-    let ID;
     for (let i = 0; i < 5; i++) {
       value = timeslots.find(
         (element) => DaysMapper(element.day) === i && element.period == Period
@@ -266,25 +281,22 @@ const Timetable = () => {
           }}
         >
           {value ? (
-            (((Class = value.class), (ID = value.id)),
-            (
-              <Grid
-                item
-                alignSelf={"center"}
-                // eslint-disable-next-line no-loop-func
-                onClick={() => viewPeriodDetails(Class, ID)}
+            <Grid
+              item
+              alignSelf={"center"}
+              // eslint-disable-next-line no-loop-func
+              onClick={() => viewPeriodDetails(i, Period)}
+            >
+              <Item
+                sx={{
+                  backgroundColor: CardColorFilter(value.subject),
+                  height: 50,
+                  ":hover": { backgroundColor: "lightskyblue" },
+                }}
               >
-                <Item
-                  sx={{
-                    backgroundColor: CardColorFilter(value.subject),
-                    height: 50,
-                    ":hover": { backgroundColor: "lightskyblue" },
-                  }}
-                >
-                  <Typography>{value.subject + "  " + value.class}</Typography>
-                </Item>
-              </Grid>
-            ))
+                <Typography>{value.subject + "  " + value.class}</Typography>
+              </Item>
+            </Grid>
           ) : Period ? (
             <div
               onDrop={(event) => onDrop(event)}
@@ -311,6 +323,8 @@ const Timetable = () => {
   };
 
   useEffect(() => {
+    fetchSubjects();
+    fetchTimeslots();
     // document.addEventListener("keyup", async function (event) {
     //   if (event.code === "Escape") {
     //     if (openModal2 !== true) {
@@ -321,8 +335,6 @@ const Timetable = () => {
     //     }
     //   }
     // });
-    fetchSubjects();
-    fetchTimeslots();
   }, [saveData]);
 
   return (

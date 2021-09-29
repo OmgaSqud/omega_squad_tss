@@ -55,7 +55,7 @@ const HomePage = () => {
         getDoc(doc(db, "users", user.uid)).then((doc) => {
           switch (doc.data().type) {
             case "student":
-              history.push("/student");
+              history.push("/student-view");
               break;
             case "teacher":
               history.push("/dashboard");

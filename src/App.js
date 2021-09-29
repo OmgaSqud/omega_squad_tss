@@ -13,13 +13,13 @@ const App = () => {
     <>
       <Navbar />
       <Switch>
-        {/* <Route exact path="/">
-          <Homepage />
-        </Route> */}
         <Route exact path="/">
+          <Homepage />
+        </Route>
+        <Route exact path="/dashboard">
           <Timetable />
         </Route>
-        <Route exact path="/student">
+        <Route exact path="/student-view">
           <StudentView />
         </Route>
       </Switch>
