@@ -12,10 +12,10 @@ const App = () => {
     <>
       <Navbar />
       <Switch>
-        <Route exact path="/">
+        {/* <Route exact path="/">
           <Homepage />
-        </Route>
-        <Route exact path="/dashboard">
+        </Route> */}
+        <Route exact path="/">
           <Timetable />
         </Route>
         <Route exact path="/student-view">

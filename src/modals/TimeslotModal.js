@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
@@ -23,8 +24,8 @@ const TimeslotModal = (props) => {
   const Grades = [6, 7, 8, 9, 10, 11, 12, 13];
   const Classes = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
-  const [Grade, setGrade] = React.useState();
-  const [Class, setClass] = React.useState("");
+  const [Grade, setGrade] = useState();
+  const [Class, setClass] = useState();
 
   const handleChange = (event) => {
     setGrade(event.target.value);
@@ -35,10 +36,19 @@ const TimeslotModal = (props) => {
   };
 
   const Save = props.save;
+
+  useEffect(() => {
+    if (props.Grade && props.Class) {
+      setGrade(props.Grade);
+      setClass(props.Class);
+    }
+  }, [props.Grade, props.Class]);
+
   return (
     <Modal
       open={props.value}
-      onClose={() => setGrade() + setClass("")}
+      disableEscapeKeyDown={true}
+      onClose={() => setGrade() + setClass()}
       onBackdropClick={props.backdrop}
       aria-labelledby="parent-modal-title"
       aria-describedby="parent-modal-description"
@@ -78,7 +88,9 @@ const TimeslotModal = (props) => {
               Generate Zoom Link
             </Button>
             <Button
-              onClick={() => Save(Grade, Class) + setGrade() + setClass("")}
+              onClick={async () =>
+                (await Save(Grade, Class)) + setGrade() + setClass()
+              }
               sx={{
                 borderRadius: 2,
                 color: "white",
