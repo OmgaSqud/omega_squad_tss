@@ -19,7 +19,7 @@ const App = () => {
         <Route exact path="/dashboard">
           <Timetable />
         </Route>
-        <Route exact path="/student">
+        <Route exact path="/student-view">
           <StudentView />
         </Route>
       </Switch>

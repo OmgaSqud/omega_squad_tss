@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MuiAppBar from "@mui/material/AppBar";
@@ -19,8 +19,19 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { collection, query, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../firebase/Firebase";
+import { AuthContext } from "../firebase/AuthContext";
 import SubjectCard from "./SubjectCard";
 import CardColorFilter from "../utilities/CardColorFilter";
 import { DaysMapper } from "../utilities/DaysHandler";
@@ -29,6 +40,12 @@ import TimeslotModal from "../modals/TimeslotModal";
 import ConfirmModal from "../modals/ConfirmModal";
 
 const Timetable = () => {
+  // const user = useContext(AuthContext).user.userDetails;
+  const user = {
+    uid: "XnH9lDsLsEWqda1B1D2ScYxGu822",
+    name: "Vinura Chandrasekara",
+    email: "vinurachan@gmail.com",
+  };
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(2),
@@ -60,9 +77,13 @@ const Timetable = () => {
   const [slotSubject, setSlotSubject] = useState();
   const [slotDay, setSlotDay] = useState();
   const [slotPeriod, setSlotPeriod] = useState();
+  const [classroom, setClassroom] = useState();
+  const [grade, setGrade] = useState();
 
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
+  const [slotID, setslotID] = useState();
+  const [updateslot, setUpdateslot] = useState(false);
   const [saveData, setSaveData] = useState(false);
 
   const drawerWidth = 240;
@@ -138,27 +159,52 @@ const Timetable = () => {
     setOpenModal(true);
   };
 
-  const saveSlotData = (Grade, Class) => {
-    if (Grade && Class) {
-      alert(
+  const saveSlotData = async (Grade, Class) => {
+    if (updateslot == false && Grade && Class) {
+      let classroom = Grade + "-" + Class;
+      let StartTime = timeperiods[
+        slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod
+      ].split(slotPeriod < 7 ? "AM" : "PM")[0];
+      let period = JSON.stringify(slotPeriod);
+
+      console.log(
         slotSubject +
           " added to " +
           slotDay +
           " Period " +
           slotPeriod +
           " of Class " +
-          Grade +
-          "-" +
-          Class +
+          classroom +
           " where startTime is " +
-          timeperiods[slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod].split(
-            slotPeriod < 7 ? "AM" : "PM"
-          )[0]
+          StartTime
       );
-      //save data to firestore
+      await addDoc(collection(db, "timeslots"), {
+        dateTime: serverTimestamp(),
+        class: classroom,
+        day: slotDay,
+        period: period,
+        startTime: StartTime,
+        subject: slotSubject,
+        teacher: user.name,
+      });
       setOpenModal(false);
       setSaveData(!saveData);
-    } else alert("Select  Grade & Class to save details");
+    } else if (updateslot == false && (!Grade || !Class)) {
+      alert("Select  Grade & Class to save details");
+    } else if (updateslot == true) {
+      let newclass = Grade + "-" + Class;
+      const update = doc(db, "timeslots", slotID);
+      await updateDoc(update, {
+        dateTime: serverTimestamp(),
+        class: newclass,
+      });
+      setOpenModal(false);
+      setClassroom();
+      setGrade();
+      setslotID();
+      setUpdateslot(false);
+      setSaveData(!saveData);
+    }
   };
 
   const ZoomAPI = () => {
@@ -167,14 +213,22 @@ const Timetable = () => {
     setOpenModal(false);
   };
 
-  const viewPeriodDetails = (Class) => {
-    //view period details
-    console.log(Class);
+  const viewPeriodDetails = (i, Period) => {
+    let id = timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).id;
+    let Class = timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).class;
+    setUpdateslot(true);
+    setslotID(id);
+    setGrade(Class.split("-")[0]);
+    setClassroom(Class.split("-")[1]);
     setOpenModal(true);
   };
 
   const fetchSubjects = async () => {
-    const docRef = doc(db, "users", "XnH9lDsLsEWqda1B1D2ScYxGu822");
+    const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -186,7 +240,10 @@ const Timetable = () => {
   };
 
   const fetchTimeslots = async () => {
-    const q = query(collection(db, "timeslots"));
+    const q = query(
+      collection(db, "timeslots"),
+      where("teacher", "==", user.name)
+    );
     let arr = [];
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -208,7 +265,6 @@ const Timetable = () => {
   const SlotMapper = (Period) => {
     let row = [];
     let value = [];
-    let Class;
     for (let i = 0; i < 5; i++) {
       value = timeslots.find(
         (element) => DaysMapper(element.day) === i && element.period == Period
@@ -225,24 +281,22 @@ const Timetable = () => {
           }}
         >
           {value ? (
-            ((Class = value.class),
-            (
-              <Grid
-                item
-                alignSelf={"center"}
-                // eslint-disable-next-line no-loop-func
-                onClick={() => viewPeriodDetails(Class)}
+            <Grid
+              item
+              alignSelf={"center"}
+              // eslint-disable-next-line no-loop-func
+              onClick={() => viewPeriodDetails(i, Period)}
+            >
+              <Item
+                sx={{
+                  backgroundColor: CardColorFilter(value.subject),
+                  height: 50,
+                  ":hover": { backgroundColor: "lightskyblue" },
+                }}
               >
-                <Item
-                  sx={{
-                    backgroundColor: CardColorFilter(value.subject),
-                    height: 50,
-                  }}
-                >
-                  <Typography>{value.subject + "  " + value.class}</Typography>
-                </Item>
-              </Grid>
-            ))
+                <Typography>{value.subject + "  " + value.class}</Typography>
+              </Item>
+            </Grid>
           ) : Period ? (
             <div
               onDrop={(event) => onDrop(event)}
@@ -271,6 +325,16 @@ const Timetable = () => {
   useEffect(() => {
     fetchSubjects();
     fetchTimeslots();
+    // document.addEventListener("keyup", async function (event) {
+    //   if (event.code === "Escape") {
+    //     if (openModal2 !== true) {
+    //       setOpenModal(false);
+    //       setClassroom();
+    //       setGrade();
+    //       return;
+    //     }
+    //   }
+    // });
   }, [saveData]);
 
   return (
@@ -383,9 +447,11 @@ const Timetable = () => {
         </Main>
         <TimeslotModal
           value={openModal}
-          backdrop={() => setOpenModal(false)}
+          backdrop={() => setOpenModal(false) + setClassroom() + setGrade()}
           save={(Grade, Class) => saveSlotData(Grade, Class)}
           generate={() => setOpenModal2(true)}
+          Grade={grade}
+          Class={classroom}
         />
         <ConfirmModal
           value={openModal2}
