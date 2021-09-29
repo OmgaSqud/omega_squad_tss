@@ -1,35 +1,39 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { useTheme } from "@mui/material/styles";
-import PropTypes from "prop-types";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LastPageIcon from "@mui/icons-material/LastPage";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
+import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Stack from "@mui/material/Stack";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import PropTypes from "prop-types";
+import * as React from "react";
+import { useEffect, useState, useContext } from "react";
 import { db } from "../firebase/Firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { AuthContext } from "../firebase/AuthContext";
 
 const StudentView = () => {
+  const user = useContext(AuthContext);
+  const userDetails = user.user.userDetails;
+
   //----------------------------------------------------Table----------------------------------------------------
   const [rows, setRows] = useState([]);
 
@@ -216,7 +220,13 @@ const StudentView = () => {
       // doc.data() is never undefined for query doc snapshots
 
       array.push(
-        createData(data.day, data.period, data.subject, data.teacher, data.link)
+        createData(
+          data.day,
+          data.startTime,
+          data.subject,
+          data.teacher,
+          data.link
+        )
       );
     });
 
@@ -261,7 +271,7 @@ const StudentView = () => {
         </FormControl>
       </Box>
 
-      <TableContainer component={Paper} class="container">
+      <TableContainer component={Paper} class="studentContainer">
         <Table aria-label="collapsible table">
           <TableHead style={{ backgroundColor: "#343A40" }}>
             <TableRow>
@@ -302,7 +312,7 @@ const StudentView = () => {
         <Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => console.log(rows, filter)}
+          onClick={() => console.log(rows, filter, userDetails.name)}
         >
           Test
         </Button>

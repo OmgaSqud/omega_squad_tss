@@ -18,15 +18,15 @@
   height: auto;
 }
 
-
 section {
   padding: 60px 0;
   overflow: hidden;
 }
 #hero .container {
   padding-top: 72px;
-  
-  .container {
+}
+
+.studentContainer {
   background-color: white;
   width: 80%;
   margin: auto;
@@ -39,4 +39,4 @@ section {
   background-color: white;
   width: 80%;
   margin: 30px auto;
-
+}
