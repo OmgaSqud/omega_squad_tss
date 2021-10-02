@@ -209,6 +209,7 @@ const Timetable = () => {
 
   const ZoomAPI = () => {
     //generate zoom link
+    alert("Zoom links sent");
     setOpenModal2(false);
     setOpenModal(false);
   };
@@ -339,10 +340,10 @@ const Timetable = () => {
 
   return (
     <Box style={{ backgroundColor: "#D2DBEB", height: "100%" }}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", marginTop: "10vh" }}>
         <CssBaseline />
         <AppBar
-          position="absolute"
+          position="fixed"
           open={open}
           sx={{ top: "10vh", backgroundColor: "#b6c1bf", color: "black" }}
         >
@@ -366,7 +367,7 @@ const Timetable = () => {
             width: drawerWidth,
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              position: "sticky",
+              position: "fixed",
               top: "10vh",
               width: drawerWidth,
               boxSizing: "border-box",

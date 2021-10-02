@@ -243,6 +243,7 @@ const StudentView = () => {
   return (
     <Box
       sx={{
+        marginTop: "10vh",
         height: "90vh",
         width: "100vw",
         bgcolor: "#D2DBEB",
