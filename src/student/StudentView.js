@@ -29,6 +29,7 @@ import * as React from "react";
 import { useEffect, useState, useContext } from "react";
 import { db } from "../firebase/Firebase";
 import { AuthContext } from "../firebase/AuthContext";
+import Grid from "@mui/material/Grid";
 
 const StudentView = () => {
   const user = useContext(AuthContext);
@@ -206,11 +207,14 @@ const StudentView = () => {
     if (filter === "today") {
       q = query(
         collection(db, "timeslots"),
-        where("class", "==", "13-A"),
+        where("class", "==", userDetails.class),
         where("day", "==", today)
       );
     } else {
-      q = query(collection(db, "timeslots"), where("class", "==", "13-A"));
+      q = query(
+        collection(db, "timeslots"),
+        where("class", "==", userDetails.class)
+      );
     }
 
     const querySnapshot = await getDocs(q);
@@ -234,8 +238,8 @@ const StudentView = () => {
   };
 
   useEffect(() => {
-    fetchDetails();
-  }, [filter]);
+    userDetails && fetchDetails();
+  }, [filter, userDetails]);
 
   //----------------------------------------------------------------------------------------------------------------
 
@@ -256,64 +260,93 @@ const StudentView = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ minWidth: 120 }} class="selectBar">
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={filter}
-            label="filter"
-            onChange={handleChange}
-          >
-            <MenuItem value={"today"}>Today</MenuItem>
-            <MenuItem value={"this week"}>This Week</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      <Grid container spacing={2} sx={{ width: "80%", margin: "0 auto" }}>
+        <Grid item xs={10}>
+          <Box sx={{ minWidth: 120 }} class="selectBar">
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={filter}
+                label="filter"
+                onChange={handleChange}
+              >
+                <MenuItem value={"today"}>Today</MenuItem>
+                <MenuItem value={"this week"}>This Week</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
-      <TableContainer component={Paper} class="studentContainer">
-        <Table aria-label="collapsible table">
-          <TableHead style={{ backgroundColor: "#343A40" }}>
-            <TableRow>
-              <TableCell />
-              <TableCell style={{ color: "white" }}>Date</TableCell>
-              <TableCell align="right" style={{ color: "white" }}>
-                Time
-              </TableCell>
-              <TableCell align="right" style={{ color: "white" }}>
-                Subject
-              </TableCell>
-              <TableCell align="right" style={{ color: "white" }}>
-                Teacher
-              </TableCell>
-              {/* <TableCell align="right">nbsp;(g)</TableCell> */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <TableContainer component={Paper} class="studentContainer">
+            <Table aria-label="collapsible table">
+              <TableHead style={{ backgroundColor: "#343A40" }}>
+                <TableRow>
+                  <TableCell />
+                  <TableCell style={{ color: "white" }}>Date</TableCell>
+                  <TableCell align="right" style={{ color: "white" }}>
+                    Time
+                  </TableCell>
+                  <TableCell align="right" style={{ color: "white" }}>
+                    Subject
+                  </TableCell>
+                  <TableCell align="right" style={{ color: "white" }}>
+                    Teacher
+                  </TableCell>
+                  {/* <TableCell align="right">nbsp;(g)</TableCell> */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(rowsPerPage > 0
+                  ? rows.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                  : rows
+                ).map((row) => (
+                  <Row key={row.date} row={row} />
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[2, 5]}
+              count={rows.length}
+              onPageChange={handleChangePage}
+              ActionsComponent={TablePaginationActions}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </TableContainer>
+        </Grid>
+        <Grid item xs={2}>
+          <Stack
+            spacing={4}
+            direction="column"
+            sx={{ marginTop: "190px", width: "50%" }}
+          >
             {(rowsPerPage > 0
               ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               : rows
             ).map((row) => (
-              <Row key={row.date} row={row} />
+              <Button
+                key={row.date}
+                variant="contained"
+                href={row.link}
+                target="_blank"
+              >
+                Join
+              </Button>
             ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[2, 5]}
-          count={rows.length}
-          onPageChange={handleChangePage}
-          ActionsComponent={TablePaginationActions}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+          </Stack>
+        </Grid>
+      </Grid>
+
       <Stack spacing={2} direction="row">
         <Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => console.log(rows, filter, userDetails.name)}
+          onClick={() => console.log(rows, filter, userDetails.class)}
         >
           Test
         </Button>

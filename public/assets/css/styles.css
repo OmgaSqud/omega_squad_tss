@@ -28,7 +28,7 @@ section {
 
 .studentContainer {
   background-color: white;
-  width: 80%;
+  /* width: 80%; */
   margin: auto;
   /* display: block !important;
   justify-content: center !important;
@@ -37,6 +37,6 @@ section {
 
 .selectBar {
   background-color: white;
-  width: 80%;
+  /* width: 80%; */
   margin: 30px auto;
 }
