@@ -8,7 +8,6 @@ export const AuthContext = createContext();
 export const AuthProvider = (props) => {
   const [user, setUser] = useState("INIT");
   const history = useHistory();
-
   useEffect(() => {
     auth.onAuthStateChanged(async (fbUser) => {
       if (fbUser == null) {

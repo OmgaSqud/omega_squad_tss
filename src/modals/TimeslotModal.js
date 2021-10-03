@@ -36,6 +36,7 @@ const TimeslotModal = (props) => {
   };
 
   const Save = props.save;
+  const Generate = props.generate;
 
   useEffect(() => {
     if (props.Grade && props.Class) {
@@ -77,7 +78,9 @@ const TimeslotModal = (props) => {
           </Box>
           <Box display="flex" justifyContent="space-around" marginTop="15%">
             <Button
-              onClick={props.generate}
+              onClick={async () =>
+                (await Generate(Grade, Class)) + setGrade() + setClass()
+              }
               sx={{
                 borderRadius: 2,
                 color: "white",

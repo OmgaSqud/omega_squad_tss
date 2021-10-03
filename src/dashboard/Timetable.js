@@ -38,6 +38,7 @@ import { DaysMapper } from "../utilities/DaysHandler";
 import { DayRetriever } from "../utilities/DaysHandler";
 import TimeslotModal from "../modals/TimeslotModal";
 import ConfirmModal from "../modals/ConfirmModal";
+import ZoomMeeting from "../zoomAPI/Zoom";
 
 const Timetable = () => {
   // const user = useContext(AuthContext).user.userDetails;
@@ -79,12 +80,14 @@ const Timetable = () => {
   const [slotPeriod, setSlotPeriod] = useState();
   const [classroom, setClassroom] = useState();
   const [grade, setGrade] = useState();
+  const [joinLink, setJoinLink] = useState(null);
 
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [slotID, setslotID] = useState();
   const [updateslot, setUpdateslot] = useState(false);
   const [saveData, setSaveData] = useState(false);
+  const [generateLink, setGenerateLink] = useState(true);
 
   const drawerWidth = 240;
 
@@ -159,14 +162,24 @@ const Timetable = () => {
     setOpenModal(true);
   };
 
-  const saveSlotData = async (Grade, Class) => {
+  const zoomLink = async (link, Topic) => {
+    if (link == true) {
+      return setJoinLink(ZoomMeeting(Topic));
+    } else {
+      return setJoinLink(null);
+    }
+  };
+
+  const saveSlotData = async (Grade, Class, link) => {
     if (updateslot == false && Grade && Class) {
       let classroom = Grade + "-" + Class;
       let StartTime = timeperiods[
         slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod
       ].split(slotPeriod < 7 ? "AM" : "PM")[0];
       let period = JSON.stringify(slotPeriod);
-
+      let Topic = slotSubject + " " + classroom;
+      await zoomLink(link, Topic);
+      console.log(joinLink);
       console.log(
         slotSubject +
           " added to " +
@@ -182,36 +195,40 @@ const Timetable = () => {
         dateTime: serverTimestamp(),
         class: classroom,
         day: slotDay,
+        link: joinLink,
         period: period,
         startTime: StartTime,
         subject: slotSubject,
         teacher: user.name,
       });
       setOpenModal(false);
+      link && setOpenModal2(false);
+      link && alert("Zoom meeting link succefully generated & sent!");
+      setClassroom();
+      setGrade();
       setSaveData(!saveData);
     } else if (updateslot == false && (!Grade || !Class)) {
       alert("Select  Grade & Class to save details");
     } else if (updateslot == true) {
       let newclass = Grade + "-" + Class;
+      let Topic = slotSubject + " " + newclass;
+      await zoomLink(link, Topic);
+      console.log(joinLink);
       const update = doc(db, "timeslots", slotID);
       await updateDoc(update, {
         dateTime: serverTimestamp(),
         class: newclass,
+        link: joinLink,
       });
       setOpenModal(false);
+      link && setOpenModal2(false);
+      link && alert("Zoom meeting link succefully generated & sent!");
       setClassroom();
       setGrade();
       setslotID();
       setUpdateslot(false);
       setSaveData(!saveData);
     }
-  };
-
-  const ZoomAPI = () => {
-    //generate zoom link
-    alert("Zoom links sent");
-    setOpenModal2(false);
-    setOpenModal(false);
   };
 
   const viewPeriodDetails = (i, Period) => {
@@ -221,8 +238,12 @@ const Timetable = () => {
     let Class = timeslots.find(
       (element) => DaysMapper(element.day) == i && element.period == Period
     ).class;
+    let subject = timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).subject;
     setUpdateslot(true);
     setslotID(id);
+    setSlotSubject(subject);
     setGrade(Class.split("-")[0]);
     setClassroom(Class.split("-")[1]);
     setOpenModal(true);
@@ -326,16 +347,6 @@ const Timetable = () => {
   useEffect(() => {
     fetchSubjects();
     fetchTimeslots();
-    // document.addEventListener("keyup", async function (event) {
-    //   if (event.code === "Escape") {
-    //     if (openModal2 !== true) {
-    //       setOpenModal(false);
-    //       setClassroom();
-    //       setGrade();
-    //       return;
-    //     }
-    //   }
-    // });
   }, [saveData]);
 
   return (
@@ -450,14 +461,18 @@ const Timetable = () => {
           value={openModal}
           backdrop={() => setOpenModal(false) + setClassroom() + setGrade()}
           save={(Grade, Class) => saveSlotData(Grade, Class)}
-          generate={() => setOpenModal2(true)}
+          generate={(Grade, Class) =>
+            Grade && Class
+              ? setClassroom(Class) + setGrade(Grade) + setOpenModal2(true)
+              : alert("Select  Grade & Class to save details")
+          }
           Grade={grade}
           Class={classroom}
         />
         <ConfirmModal
           value={openModal2}
           back={() => setOpenModal2(false)}
-          zoom={() => ZoomAPI()}
+          zoom={async () => saveSlotData(grade, classroom, generateLink)}
         />
       </Box>
     </Box>
