@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
-//import Footer from "./shared/Footer";
+import Footer from "./shared/Footer";
 
 import Timetable from "./dashboard/Timetable";
 import Homepage from "./home/Homepage";
@@ -27,7 +27,7 @@ const App = () => {
           <AddUser />
         </Route>
       </Switch>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 };
