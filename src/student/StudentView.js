@@ -30,10 +30,12 @@ import { useEffect, useState, useContext } from "react";
 import { db } from "../firebase/Firebase";
 import { AuthContext } from "../firebase/AuthContext";
 import Grid from "@mui/material/Grid";
+import { useHistory } from "react-router";
 
 const StudentView = () => {
   const user = useContext(AuthContext);
   const userDetails = user.user.userDetails;
+  const history = useHistory();
 
   //----------------------------------------------------Table----------------------------------------------------
   const [rows, setRows] = useState([]);
@@ -349,6 +351,13 @@ const StudentView = () => {
           onClick={() => console.log(rows, filter, userDetails.class)}
         >
           Test
+        </Button>
+        <Button
+          variant="contained"
+          sx={{ margin: "auto", marginTop: "20px" }}
+          onClick={() => history.push("/add-user")}
+        >
+          Admin
         </Button>
       </Stack>
     </Box>
