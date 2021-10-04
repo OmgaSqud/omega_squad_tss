@@ -42,13 +42,14 @@ const StudentView = () => {
 
   const today = "Monday";
 
-  function createData(date, time, subject, teacher, link) {
+  function createData(date, time, subject, teacher, link, dateTime) {
     return {
       date,
       time,
       subject,
       teacher,
       link,
+      dateTime,
     };
   }
 
@@ -71,9 +72,26 @@ const StudentView = () => {
           <TableCell component="th" scope="row">
             {row.date}
           </TableCell>
-          <TableCell align="right">{row.time}</TableCell>
-          <TableCell align="right">{row.subject}</TableCell>
-          <TableCell align="right">{row.teacher}</TableCell>
+          <TableCell align="center">{row.time}</TableCell>
+          <TableCell align="center">{row.subject}</TableCell>
+          <TableCell align="center">{row.teacher}</TableCell>
+          <TableCell align="center">
+            {row.link == null ? (
+              <Button variant="text" disabled>
+                Pending
+              </Button>
+            ) : (
+              <Button
+                key={row.date}
+                variant="contained"
+                href={row.link}
+                target="_blank"
+                sx={{ width: "50%" }}
+              >
+                Join
+              </Button>
+            )}
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -231,11 +249,16 @@ const StudentView = () => {
           data.startTime,
           data.subject,
           data.teacher,
-          data.link
+          data.link,
+          data.dateTime
         )
       );
     });
-
+    array.sort(function (a, b) {
+      var c = new Date(a.dateTime);
+      var d = new Date(b.dateTime);
+      return c - d;
+    });
     setRows(array);
   };
 
@@ -250,20 +273,20 @@ const StudentView = () => {
     <Box
       sx={{
         marginTop: "10vh",
-        height: "90vh",
+        height: "85vh",
         width: "100vw",
         bgcolor: "#D2DBEB",
-        padding: "50px",
+        padding: "40px 50px",
       }}
     >
       <Box textAlign="center">
-        <Typography variant="h4" gutterBottom component="div">
+        <Typography variant="h4" component="div">
           My Schedule
         </Typography>
       </Box>
 
       <Grid container spacing={2} sx={{ width: "80%", margin: "0 auto" }}>
-        <Grid item xs={10}>
+        <Grid item xs={12}>
           <Box sx={{ minWidth: 120 }} class="selectBar">
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Filter</InputLabel>
@@ -286,16 +309,18 @@ const StudentView = () => {
                 <TableRow>
                   <TableCell />
                   <TableCell style={{ color: "white" }}>Date</TableCell>
-                  <TableCell align="right" style={{ color: "white" }}>
+                  <TableCell align="center" style={{ color: "white" }}>
                     Time
                   </TableCell>
-                  <TableCell align="right" style={{ color: "white" }}>
+                  <TableCell align="center" style={{ color: "white" }}>
                     Subject
                   </TableCell>
-                  <TableCell align="right" style={{ color: "white" }}>
+                  <TableCell align="center" style={{ color: "white" }}>
                     Teacher
                   </TableCell>
-                  {/* <TableCell align="right">nbsp;(g)</TableCell> */}
+                  <TableCell align="center" style={{ color: "white" }}>
+                    Meeting
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -311,7 +336,7 @@ const StudentView = () => {
               </TableBody>
             </Table>
             <TablePagination
-              rowsPerPageOptions={[2, 5]}
+              rowsPerPageOptions={[2, 4]}
               count={rows.length}
               onPageChange={handleChangePage}
               ActionsComponent={TablePaginationActions}
@@ -320,27 +345,6 @@ const StudentView = () => {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableContainer>
-        </Grid>
-        <Grid item xs={2}>
-          <Stack
-            spacing={4}
-            direction="column"
-            sx={{ marginTop: "190px", width: "50%" }}
-          >
-            {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <Button
-                key={row.date}
-                variant="contained"
-                href={row.link}
-                target="_blank"
-              >
-                Join
-              </Button>
-            ))}
-          </Stack>
         </Grid>
       </Grid>
 
@@ -352,13 +356,13 @@ const StudentView = () => {
         >
           Test
         </Button>
-        <Button
+        {/*<Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
           onClick={() => history.push("/add-user")}
         >
           Admin
-        </Button>
+        </Button>*/}
       </Stack>
     </Box>
   );
