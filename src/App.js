@@ -9,6 +9,8 @@ import Navbar from "./shared/Navbar";
 import StudentView from "./student/StudentView";
 import AddUser from "./admin/AddUser";
 
+import EditUser from "./admin/EditUser";
+
 const App = () => {
   return (
     <>
@@ -25,6 +27,9 @@ const App = () => {
         </Route>
         <Route exact path="/add-user">
           <AddUser />
+        </Route>
+        <Route exact path="/edit-user">
+          <EditUser />
         </Route>
       </Switch>
       <Footer />
