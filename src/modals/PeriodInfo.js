@@ -5,7 +5,7 @@ import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import Dropdown from "../shared/Dropdown";
 
-const TimeslotModal = (props) => {
+const PeriodInfo = (props) => {
   const style = {
     position: "absolute",
     top: "50%",
@@ -26,12 +26,15 @@ const TimeslotModal = (props) => {
 
   const [Grade, setGrade] = useState();
   const [Class, setClass] = useState();
+  const [changeData, setChangeData] = useState(false);
 
   const handleChange = (event) => {
+    setChangeData(true);
     setGrade(event.target.value);
   };
 
   const handleChange2 = (event) => {
+    setChangeData(true);
     setClass(event.target.value);
   };
 
@@ -39,6 +42,9 @@ const TimeslotModal = (props) => {
   const Generate = props.generate;
 
   useEffect(() => {
+    setChangeData(false);
+    setGrade();
+    setClass();
     if (props.Grade && props.Class) {
       setGrade(props.Grade);
       setClass(props.Class);
@@ -49,14 +55,35 @@ const TimeslotModal = (props) => {
     <Modal
       open={props.value}
       disableEscapeKeyDown={true}
-      onClose={() => setGrade() + setClass()}
+      onClose={() => setGrade() + setClass() + setChangeData(false)}
       onBackdropClick={props.backdrop}
       aria-labelledby="parent-modal-title"
       aria-describedby="parent-modal-description"
     >
       <div>
         <Box sx={{ ...style }}>
-          <h2 id="parent-modal-title">Period Details</h2>
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
+          >
+            <h2 id="parent-modal-title">{props.Title}</h2>
+            {props.Grade && props.Class && props.ID && (
+              <Button
+                onClick={props.delete}
+                sx={{
+                  alignSelf: "center",
+                  height: 35,
+                  borderRadius: 2,
+                  color: "white",
+                  backgroundColor: "#C12F2F",
+                  ":hover": { backgroundColor: "#FF0000" },
+                }}
+              >
+                Delete Period
+              </Button>
+            )}
+          </Box>
           <Box
             display="flex"
             flexDirection="row"
@@ -79,7 +106,8 @@ const TimeslotModal = (props) => {
           <Box display="flex" justifyContent="space-around" marginTop="15%">
             <Button
               onClick={async () =>
-                (await Generate(Grade, Class)) + setGrade() + setClass()
+                (await Generate(Grade, Class)) + (!Grade && !Class) &&
+                setGrade() + setClass()
               }
               sx={{
                 borderRadius: 2,
@@ -88,11 +116,14 @@ const TimeslotModal = (props) => {
                 ":hover": { backgroundColor: "navy" },
               }}
             >
-              Generate Zoom Link
+              {props.btnName}
             </Button>
             <Button
+              disabled={changeData === true ? false : true}
               onClick={async () =>
-                (await Save(Grade, Class)) + setGrade() + setClass()
+                (await Save(Grade, Class)) + !props.Grade &&
+                !props.Class &&
+                setGrade() + setClass()
               }
               sx={{
                 borderRadius: 2,
@@ -110,4 +141,4 @@ const TimeslotModal = (props) => {
   );
 };
 
-export default TimeslotModal;
+export default PeriodInfo;

@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 
-const ConfirmModal = (props) => {
+const ConfirmLink = (props) => {
   const style = {
     position: "absolute",
     top: "50%",
@@ -29,7 +29,7 @@ const ConfirmModal = (props) => {
         <div>
           <Box sx={{ ...style }}>
             <p id="child-modal-description">
-              Are you sure you want to Generate & Send the zoom link?
+              Are you sure you want to create a zoom link?
             </p>
             <Box display="flex" justifyContent="space-between">
               <Button
@@ -64,4 +64,4 @@ const ConfirmModal = (props) => {
   );
 };
 
-export default ConfirmModal;
+export default ConfirmLink;

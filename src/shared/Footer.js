@@ -13,7 +13,7 @@ const Footer = () => {
           color: "white",
           display: "flex",
           alignItems: "center",
-          paddingLeft: "10vw",
+          paddingLeft: "43vw",
         }}
       >
         Designed by Omega_Squad
