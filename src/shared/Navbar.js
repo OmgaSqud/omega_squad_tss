@@ -62,6 +62,14 @@ const Navbar = () => {
                 label="Contact"
                 onClick={() => history.push("/dashboard")}
               />
+              <LinkTab
+                label="Add User"
+                onClick={() => history.push("/add-user")}
+              />
+              <LinkTab
+                label="Edit User"
+                onClick={() => history.push("/edit-user")}
+              />
             </Tabs>
           </Box>
         </Toolbar>

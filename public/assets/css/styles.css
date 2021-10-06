@@ -1,7 +1,7 @@
 #hero {
   width: 100%;
-  height: 940px;
-  background-image: url(../../bsk86n1.jpg);
+  height: 100vh;
+  background-image: url(../../Blended-learning-e-learning.jpeg);
   background-repeat: no-repeat, repeat;
   background-size: cover;
   background-position: center;
@@ -39,4 +39,14 @@ section {
   background-color: white;
   /* width: 80%; */
   margin: 30px auto;
+}
+
+.adminBgLeft {
+  background-color: #7e94cf;
+  height: 85vh;
+}
+
+.adminBgRight {
+  background-color: #d2dbeb;
+  height: 85vh;
 }
