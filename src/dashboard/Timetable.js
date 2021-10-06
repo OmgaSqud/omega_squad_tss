@@ -28,6 +28,7 @@ import {
   getDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
@@ -36,9 +37,11 @@ import SubjectCard from "./SubjectCard";
 import CardColorFilter from "../utilities/CardColorFilter";
 import { DaysMapper } from "../utilities/DaysHandler";
 import { DayRetriever } from "../utilities/DaysHandler";
-import TimeslotModal from "../modals/TimeslotModal";
-import ConfirmModal from "../modals/ConfirmModal";
+import PeriodInfo from "../modals/PeriodInfo";
+import ConfirmLink from "../modals/ConfirmLink";
+import ConfirmDelete from "../modals/ConfirmDelete";
 import ZoomMeeting from "../zoomAPI/Zoom";
+import Axios from "axios";
 
 const Timetable = () => {
   // const user = useContext(AuthContext).user.userDetails;
@@ -80,14 +83,17 @@ const Timetable = () => {
   const [slotPeriod, setSlotPeriod] = useState();
   const [classroom, setClassroom] = useState();
   const [grade, setGrade] = useState();
+
+  const [startLink, setStartLink] = useState(null);
   const [joinLink, setJoinLink] = useState(null);
 
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [modalTitle, setModalTitle] = useState();
   const [slotID, setslotID] = useState();
   const [updateslot, setUpdateslot] = useState(false);
   const [saveData, setSaveData] = useState(false);
-  const [generateLink, setGenerateLink] = useState(true);
 
   const drawerWidth = 240;
 
@@ -148,6 +154,7 @@ const Timetable = () => {
 
   const onDrag = (subject) => {
     setSlotSubject(subject);
+    setStartLink(null);
   };
 
   const onDragOver = (event, i, Period) => {
@@ -158,15 +165,27 @@ const Timetable = () => {
 
   const onDrop = (event) => {
     event.preventDefault();
+    setModalTitle(slotSubject + " - " + slotDay + " Period " + slotPeriod);
     console.log(slotSubject + " added to " + slotDay + " Period " + slotPeriod);
     setOpenModal(true);
   };
 
   const zoomLink = async (link, Topic) => {
-    if (link == true) {
-      return setJoinLink(ZoomMeeting(Topic));
+    if (link === true) {
+      Axios.post("/newMeeting", { topic: Topic })
+        .then((response) => {
+          console.log(response.data.Meeting_Details.start_url);
+          console.log(response.data.Meeting_Details.join_url);
+          return (
+            setStartLink(response.data.Meeting_Details.start_url) +
+            setJoinLink(response.data.Meeting_Details.join_url)
+          );
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
     } else {
-      return setJoinLink(null);
+      return setStartLink(null) + setJoinLink(null);
     }
   };
 
@@ -178,8 +197,9 @@ const Timetable = () => {
       ].split(slotPeriod < 7 ? "AM" : "PM")[0];
       let period = JSON.stringify(slotPeriod);
       let Topic = slotSubject + " " + classroom;
-      await zoomLink(link, Topic);
-      console.log(joinLink);
+      // zoomLink(link, Topic);
+      // console.log(startLink);
+      // console.log(joinLink);
       console.log(
         slotSubject +
           " added to " +
@@ -195,7 +215,8 @@ const Timetable = () => {
         dateTime: serverTimestamp(),
         class: classroom,
         day: slotDay,
-        link: joinLink,
+        startlink: startLink,
+        joinlink: joinLink,
         period: period,
         startTime: StartTime,
         subject: slotSubject,
@@ -206,19 +227,22 @@ const Timetable = () => {
       link && alert("Zoom meeting link succefully generated & sent!");
       setClassroom();
       setGrade();
+      setModalTitle();
       setSaveData(!saveData);
-    } else if (updateslot == false && (!Grade || !Class)) {
+    } else if (!Grade || !Class) {
       alert("Select  Grade & Class to save details");
     } else if (updateslot == true) {
       let newclass = Grade + "-" + Class;
       let Topic = slotSubject + " " + newclass;
-      await zoomLink(link, Topic);
-      console.log(joinLink);
+      // zoomLink(link, Topic);
+      // console.log(startLink);
+      // console.log(joinLink);
       const update = doc(db, "timeslots", slotID);
       await updateDoc(update, {
         dateTime: serverTimestamp(),
         class: newclass,
-        link: joinLink,
+        startlink: startLink,
+        joinlink: joinLink,
       });
       setOpenModal(false);
       link && setOpenModal2(false);
@@ -227,11 +251,12 @@ const Timetable = () => {
       setGrade();
       setslotID();
       setUpdateslot(false);
+      setModalTitle();
       setSaveData(!saveData);
     }
   };
 
-  const viewPeriodDetails = (i, Period) => {
+  const viewPeriodDetails = async (i, Period) => {
     let id = timeslots.find(
       (element) => DaysMapper(element.day) == i && element.period == Period
     ).id;
@@ -241,12 +266,25 @@ const Timetable = () => {
     let subject = timeslots.find(
       (element) => DaysMapper(element.day) == i && element.period == Period
     ).subject;
+    let link = await timeslots.find(
+      (element) => DaysMapper(element.day) == i && element.period == Period
+    ).startlink;
     setUpdateslot(true);
     setslotID(id);
+    setStartLink(link);
     setSlotSubject(subject);
     setGrade(Class.split("-")[0]);
     setClassroom(Class.split("-")[1]);
+    setModalTitle(subject + " - " + DayRetriever(i) + " Period " + Period);
     setOpenModal(true);
+  };
+
+  const deletePeriod = async (slotID) => {
+    await deleteDoc(doc(db, "timeslots", slotID));
+    setSaveData(!saveData);
+    setOpenModal3(false);
+    setOpenModal(false);
+    setslotID();
   };
 
   const fetchSubjects = async () => {
@@ -274,6 +312,8 @@ const Timetable = () => {
         id: doc.id,
         class: data.class,
         day: data.day,
+        startlink: data.startlink,
+        joinlink: data.joinlink,
         period: data.period,
         subject: data.subject,
       });
@@ -428,7 +468,7 @@ const Timetable = () => {
                         fontSize: 20,
                         fontWeight: "bold",
                         backgroundColor: "#8CD4CD",
-                        width: 150,
+                        width: heading === "Time" ? 130 : 150,
                       }}
                     >
                       {heading}
@@ -457,22 +497,58 @@ const Timetable = () => {
             </Table>
           </TableContainer>
         </Main>
-        <TimeslotModal
+        <PeriodInfo
+          Title={modalTitle}
           value={openModal}
-          backdrop={() => setOpenModal(false) + setClassroom() + setGrade()}
-          save={(Grade, Class) => saveSlotData(Grade, Class)}
-          generate={(Grade, Class) =>
-            Grade && Class
-              ? setClassroom(Class) + setGrade(Grade) + setOpenModal2(true)
-              : alert("Select  Grade & Class to save details")
+          btnName={startLink ? "Join Zoom Class" : "Create Zoom Link"}
+          backdrop={() =>
+            setOpenModal(false) +
+            setClassroom() +
+            setGrade() +
+            setModalTitle() +
+            setUpdateslot(false) +
+            setslotID()
           }
+          save={(Grade, Class) =>
+            zoomLink(false, null) + saveSlotData(Grade, Class)
+          }
+          generate={
+            startLink
+              ? () =>
+                  window.open(startLink, "_blank") +
+                  setOpenModal(false) +
+                  setStartLink(null)
+              : (Grade, Class) =>
+                  Grade && Class
+                    ? setClassroom(Class) +
+                      setGrade(Grade) +
+                      setOpenModal2(true)
+                    : alert("Select  Grade & Class to save details")
+          }
+          delete={() => setOpenModal3(true)}
           Grade={grade}
           Class={classroom}
+          ID={slotID}
         />
-        <ConfirmModal
+        <ConfirmLink
           value={openModal2}
           back={() => setOpenModal2(false)}
-          zoom={async () => saveSlotData(grade, classroom, generateLink)}
+          zoom={async () =>
+            (await zoomLink(
+              true,
+              slotSubject + " " + grade + "-" + classroom
+            )) + saveSlotData(grade, classroom, true)
+          }
+        />
+        <ConfirmDelete
+          value={openModal3}
+          back={() => setOpenModal3(false)}
+          delete={async () =>
+            (await deletePeriod(slotID)) +
+            setClassroom() +
+            setGrade() +
+            setUpdateslot(false)
+          }
         />
       </Box>
     </Box>

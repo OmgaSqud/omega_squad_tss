@@ -42,7 +42,7 @@ const Navbar = () => {
             component="div"
             sx={{ display: { xs: "none", sm: "block" }, marginLeft: "5%" }}
           >
-            TSS
+            MOMENT
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box>
