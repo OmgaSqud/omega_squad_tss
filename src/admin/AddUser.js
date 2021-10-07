@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState, useContext } from "react";
-import { db } from "../firebase/Firebase";
+import { auth, db } from "../firebase/Firebase";
 import { AuthContext } from "../firebase/AuthContext";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -18,20 +18,129 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
-const AddUser = () => {
-  const [newUser, setNewUser] = React.useState("");
-  const [grade, setGrade] = React.useState("");
-  const [cls, setCls] = React.useState("");
+//-------------------------------------------------------------------------------
+import { doc, setDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-  const handleChange = (event) => {
-    setNewUser(event.target.value);
+const AddUser = () => {
+  const clear = () => {
+    setDetails({
+      name: "",
+      email: "",
+      password: "",
+      type: "",
+      subjects: [],
+      grade: "",
+      class: "",
+    });
   };
-  const handleChangeGrade = (event) => {
-    setGrade(event.target.value);
+
+  const [details, setDetails] = useState({
+    name: "",
+    email: "",
+    password: "",
+    type: "",
+    subjects: [],
+    grade: "",
+    class: "",
+  });
+  //---------------------------------------------------
+
+  const handleAddUser = () => {
+    console.log(details);
+    setArray();
+    console.log(details);
+    //===============================
+    createUserWithEmailAndPassword(auth, details.email, details.password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        if (details.type == "student") {
+          setDoc(doc(db, "users", user.uid), {
+            name: details.name,
+            email: details.email,
+            password: details.password,
+            type: details.type,
+            class: details.grade + "-" + details.class,
+          });
+        } else if (details.type == "teacher") {
+          setDoc(doc(db, "users", user.uid), {
+            name: details.name,
+            email: details.email,
+            password: details.password,
+            type: details.type,
+            subjects: details.subjects,
+          });
+        } else if (details.type == "admin") {
+          setDoc(doc(db, "users", user.uid), {
+            name: details.name,
+            email: details.email,
+            password: details.password,
+            type: details.type,
+          });
+        }
+        console.log("created");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
+
+    //==============================
+
+    //------------------------------------------------------
   };
-  const handleChangeClass = (event) => {
-    setCls(event.target.value);
+
+  const [subjects, setSubjects] = useState({
+    maths: false,
+    chem: false,
+    agr: false,
+    bio: false,
+    eng: false,
+    ict: false,
+    psc: false,
+    git: false,
+  });
+
+  const setArray = (e) => {
+    // subjects.forEach((element) => {
+    //   setDetails((details) => ({ ...details.subjects.push(element) }));
+    // });
+    if (subjects.maths) {
+      details.subjects.push("Maths");
+    }
+    if (subjects.agr) {
+      details.subjects.push("Aggriculture");
+    }
+    if (subjects.bio) {
+      details.subjects.push("Biology");
+    }
+    if (subjects.chem) {
+      details.subjects.push("Chemistry");
+    }
+    if (subjects.eng) {
+      details.subjects.push("English");
+    }
+    if (subjects.git) {
+      details.subjects.push("GIT");
+    }
+    if (subjects.ict) {
+      details.subjects.push("ICT");
+    }
+    if (subjects.psc) {
+      details.subjects.push("Physics");
+    }
   };
+
+  const setValue = (e) =>
+    setDetails((details) => ({ ...details, [e.target.name]: e.target.value }));
+
+  const setSubjectValue = (e) =>
+    setSubjects((subjects) => ({
+      ...subjects,
+      [e.target.name]: !subjects[e.target.name],
+    }));
 
   return (
     <Box
@@ -83,6 +192,9 @@ const AddUser = () => {
               <Typography variant="h4" gutterBottom component="div">
                 User Management
               </Typography>
+              {/**--------------------------------------------------------------------------------------------------------
+               * ---------------------------------------------------------------------------------------------------------
+               */}
             </Box>
             <Box>
               <Box sx={{ padding: "20px" }}>
@@ -90,18 +202,21 @@ const AddUser = () => {
                 <Box sx={{ width: "80%", margin: "0 auto" }}>
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
-                      Select User
+                      User Type
                     </InputLabel>
                     <Select
+                      name="type"
                       labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={newUser}
+                      id="type"
                       label="newUser"
-                      onChange={handleChange}
                       sx={{ backgroundColor: "white" }}
+                      fullWidth
+                      value={details.type}
+                      onChange={setValue}
                     >
                       <MenuItem value={"teacher"}>Teacher</MenuItem>
                       <MenuItem value={"student"}>Student</MenuItem>
+                      <MenuItem value={"admin"}>Admin</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -119,10 +234,14 @@ const AddUser = () => {
                   autoComplete="off"
                 >
                   <TextField
+                    name="name"
                     id="outlined-basic"
                     label="Name"
                     variant="outlined"
                     sx={{ backgroundColor: "white" }}
+                    fullWidth
+                    value={details.name}
+                    onChange={setValue}
                   />
                 </Box>
                 <Box
@@ -139,14 +258,45 @@ const AddUser = () => {
                   autoComplete="off"
                 >
                   <TextField
+                    name="email"
                     id="outlined-basic"
                     label="Email"
                     variant="outlined"
                     sx={{ backgroundColor: "white" }}
+                    fullWidth
+                    value={details.email}
+                    onChange={setValue}
                   />
                 </Box>
 
-                {newUser === "student" ? (
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": {
+                      margin: "0 auto",
+                      mt: 2,
+                      ml: 14,
+                      width: "80%",
+                    },
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    name="password"
+                    label="Password"
+                    placeholder="Enter Password"
+                    type="password"
+                    fullWidth
+                    required
+                    variant="outlined"
+                    sx={{ backgroundColor: "white" }}
+                    value={details.password}
+                    onChange={setValue}
+                  ></TextField>
+                </Box>
+
+                {details.type === "student" ? (
                   <Box sx={{ flexGrow: 1 }}>
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
@@ -161,12 +311,13 @@ const AddUser = () => {
                               Select Grade
                             </InputLabel>
                             <Select
+                              name="grade"
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"
-                              value={grade}
                               label="grade"
                               sx={{ backgroundColor: "white" }}
-                              onChange={handleChangeGrade}
+                              value={details.grade}
+                              onChange={setValue}
                             >
                               <MenuItem value={"6"}>6</MenuItem>
                               <MenuItem value={"7"}>7</MenuItem>
@@ -192,12 +343,13 @@ const AddUser = () => {
                               Select class
                             </InputLabel>
                             <Select
+                              name="class"
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"
-                              value={cls}
                               label="class"
                               sx={{ backgroundColor: "white" }}
-                              onChange={handleChangeClass}
+                              value={details.class}
+                              onChange={setValue}
                             >
                               <MenuItem value={"A"}>A</MenuItem>
                               <MenuItem value={"B"}>B</MenuItem>
@@ -213,7 +365,7 @@ const AddUser = () => {
                     </Grid>
                   </Box>
                 ) : (
-                  newUser === "teacher" && (
+                  details.type === "teacher" && (
                     <Box sx={{ marginTop: "20px" }}>
                       <label style={{ margin: "20px 10%", fontWeight: "bold" }}>
                         Subjects
@@ -223,15 +375,40 @@ const AddUser = () => {
                           <Grid item xs={4}>
                             <FormGroup>
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="maths"
+                                    id="maths"
+                                    value="Com.Maths"
+                                    checked={subjects.maths}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="Com.Maths"
                               />
+                              <p>maths: {subjects.maths ? "true" : "false"}</p>
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="chem"
+                                    id="chem"
+                                    value="Chemistry"
+                                    checked={subjects.chem}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="Chemistry"
                               />
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="agr"
+                                    id="agr"
+                                    value="Agriculture"
+                                    checked={subjects.agr}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="Agriculture"
                               />
                             </FormGroup>
@@ -239,15 +416,39 @@ const AddUser = () => {
                           <Grid item xs={4}>
                             <FormGroup>
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="bio"
+                                    id="bio"
+                                    value="Biology"
+                                    checked={subjects.bio}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="Biology"
                               />
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="eng"
+                                    id="eng"
+                                    value="English"
+                                    checked={subjects.eng}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="English"
                               />
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="ict"
+                                    id="ict"
+                                    value="ICT"
+                                    checked={subjects.ict}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="ICT"
                               />
                             </FormGroup>
@@ -255,11 +456,27 @@ const AddUser = () => {
                           <Grid item xs={4}>
                             <FormGroup>
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="psc"
+                                    id="psc"
+                                    value="Physics"
+                                    checked={subjects.psc}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="Physics"
                               />
                               <FormControlLabel
-                                control={<Checkbox />}
+                                control={
+                                  <Checkbox
+                                    name="git"
+                                    id="git"
+                                    value="GIT"
+                                    checked={subjects.git}
+                                    onClick={setSubjectValue}
+                                  />
+                                }
                                 label="GIT"
                               />
                             </FormGroup>
@@ -271,10 +488,16 @@ const AddUser = () => {
                 )}
 
                 <Stack spacing={2} direction="row" sx={{ margin: "20px 40%" }}>
-                  <Button variant="contained" sx={{ width: "100px" }}>
+                  <Button
+                    variant="contained"
+                    sx={{ width: "100px" }}
+                    onClick={clear}
+                  >
                     Clear
                   </Button>
-                  <Button variant="contained">Add User</Button>
+                  <Button variant="contained" onClick={handleAddUser}>
+                    Add User
+                  </Button>
                 </Stack>
               </Box>
             </Box>

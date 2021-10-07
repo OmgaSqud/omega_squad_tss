@@ -356,13 +356,7 @@ const StudentView = () => {
         >
           Test
         </Button>
-        {/*<Button
-          variant="contained"
-          sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => history.push("/add-user")}
-        >
-          Admin
-        </Button>*/}
+
       </Stack>
     </Box>
   );
