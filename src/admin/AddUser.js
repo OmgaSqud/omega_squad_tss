@@ -144,7 +144,7 @@ const AddUser = () => {
 
   return (
     <Box
-      sx={{ marginTop: "10vh", height: "90vh", width: "100vw", flexGrow: 1 }}
+      sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
     >
       <Grid container spacing={0}>
         <Grid item xs={3}>
@@ -226,7 +226,7 @@ const AddUser = () => {
                     "& > :not(style)": {
                       margin: "0 auto",
                       mt: 2,
-                      ml: 14,
+                      ml: "10%",
                       width: "80%",
                     },
                   }}
@@ -250,7 +250,7 @@ const AddUser = () => {
                     "& > :not(style)": {
                       margin: "0 auto",
                       mt: 2,
-                      ml: 14,
+                      ml: "10%",
                       width: "80%",
                     },
                   }}
@@ -321,7 +321,8 @@ const AddUser = () => {
                             >
                               <MenuItem value={"6"}>6</MenuItem>
                               <MenuItem value={"7"}>7</MenuItem>
-                              <MenuItem value={"8"}>8</MenuItem>9{" "}
+                              <MenuItem value={"8"}>8</MenuItem>
+                              <MenuItem value={"9"}>9</MenuItem>
                               <MenuItem value={"10"}>10</MenuItem>
                               <MenuItem value={"11"}>11</MenuItem>
                               <MenuItem value={"12"}>12</MenuItem>

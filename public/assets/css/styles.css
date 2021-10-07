@@ -43,19 +43,10 @@ section {
 
 .adminBgLeft {
   background-color: #7e94cf;
-  height: 90vh;
+  height: 85vh;
 }
 
 .adminBgRight {
   background-color: #d2dbeb;
-  height: 90vh;
-}
-
-.btn_editUser {
-  width: 80%;
-  background-color: #353535;
-}
-.btn_editUser :hover {
-  width: 80%;
-  background-color: #707070;
+  height: 85vh;
 }

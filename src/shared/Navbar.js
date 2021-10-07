@@ -55,12 +55,20 @@ const Navbar = () => {
             >
               <LinkTab label="Home" onClick={() => history.push("/")} />
               <LinkTab
-                label="About"
+                label="Student"
                 onClick={() => history.push("/student-view")}
               />
               <LinkTab
-                label="Contact"
+                label="Teacher"
                 onClick={() => history.push("/dashboard")}
+              />
+              <LinkTab
+                label="New"
+                onClick={() => history.push("/add-user")}
+              />
+              <LinkTab
+                label="Edit"
+                onClick={() => history.push("/edit-user")}
               />
             </Tabs>
           </Box>
