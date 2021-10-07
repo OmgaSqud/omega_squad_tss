@@ -1,11 +1,9 @@
-import {
-  Avatar,
-  Button,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import Paper from "@mui/material/Paper";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import LockOutlined from "@material-ui/icons/LockOutlined";
 import Link from "@mui/material/Link";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";

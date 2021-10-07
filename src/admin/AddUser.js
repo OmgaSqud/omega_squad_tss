@@ -35,7 +35,7 @@ const AddUser = () => {
 
   return (
     <Box
-      sx={{ marginTop: "10vh", height: "90vh", width: "100vw", flexGrow: 1 }}
+      sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
     >
       <Grid container spacing={0}>
         <Grid item xs={3}>
