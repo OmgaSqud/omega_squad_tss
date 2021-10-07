@@ -61,7 +61,7 @@ const HomePage = () => {
               history.push("/dashboard");
               break;
             case "admin":
-              history.push("/");
+              history.push("/add-user");
               break;
             default:
               history.push("/");
@@ -123,7 +123,6 @@ const HomePage = () => {
         setUser(user);
       } else {
         setUser("");
-        console.log("hello");
       }
     });
   };
