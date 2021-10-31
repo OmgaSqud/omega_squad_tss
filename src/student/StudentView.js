@@ -42,13 +42,13 @@ const StudentView = () => {
 
   const today = "Monday";
 
-  function createData(date, time, subject, teacher, link, dateTime) {
+  function createData(date, time, subject, teacher, joinlink, dateTime) {
     return {
       date,
       time,
       subject,
       teacher,
-      link,
+      joinlink,
       dateTime,
     };
   }
@@ -76,7 +76,7 @@ const StudentView = () => {
           <TableCell align="center">{row.subject}</TableCell>
           <TableCell align="center">{row.teacher}</TableCell>
           <TableCell align="center">
-            {row.link == null ? (
+            {row.joinlink == null ? (
               <Button variant="text" disabled>
                 Pending
               </Button>
@@ -84,7 +84,7 @@ const StudentView = () => {
               <Button
                 key={row.date}
                 variant="contained"
-                href={row.link}
+                href={row.joinlink}
                 target="_blank"
                 sx={{ width: "50%" }}
               >
@@ -98,7 +98,7 @@ const StudentView = () => {
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box sx={{ margin: 1 }}>
                 <Typography variant="h6" gutterBottom component="div">
-                  link
+                  Joinlink
                 </Typography>
 
                 <Typography
@@ -107,8 +107,12 @@ const StudentView = () => {
                   sx={{ textDecoration: "underline" }}
                   gutterBottom
                   component="div"
+                  href={row.joinlink}
+                  target="_blank"
                 >
-                  {row.link}
+                  <a href={row.joinlink} target="_blank" rel="noreferrer">
+                    {row.joinlink}
+                  </a>
                 </Typography>
               </Box>
             </Collapse>
@@ -123,7 +127,7 @@ const StudentView = () => {
       time: PropTypes.string.isRequired,
       teacher: PropTypes.string.isRequired,
       subject: PropTypes.string.isRequired,
-      link: PropTypes.string.isRequired,
+      joinlink: PropTypes.string.isRequired,
       date: PropTypes.string.isRequired,
     }).isRequired,
   };
@@ -215,7 +219,7 @@ const StudentView = () => {
   //--------------------------------------------------------Select Bar------------------------------------------------
   const [filter, setFilter] = React.useState("today");
 
-  const handleChange = (event) => {
+  const handleChangeSelect = (event) => {
     setFilter(event.target.value);
   };
   //------------------------------------------------------------------------------------------------------------------
@@ -223,6 +227,7 @@ const StudentView = () => {
   //-------------------------------------------------------Functions and Queries--------------------------------------
 
   const fetchDetails = async () => {
+    setRows([]);
     let q;
     if (filter === "today") {
       q = query(
@@ -249,16 +254,16 @@ const StudentView = () => {
           data.startTime,
           data.subject,
           data.teacher,
-          data.link,
+          data.joinlink,
           data.dateTime
         )
       );
     });
-    array.sort(function (a, b) {
-      var c = new Date(a.dateTime);
-      var d = new Date(b.dateTime);
-      return c - d;
-    });
+    // array.sort(function (a, b) {
+    //   var c = new Date(a.dateTime);
+    //   var d = new Date(b.dateTime);
+    //   return c - d;
+    // });
     setRows(array);
   };
 
@@ -295,7 +300,7 @@ const StudentView = () => {
                 id="demo-simple-select"
                 value={filter}
                 label="filter"
-                onChange={handleChange}
+                onChange={handleChangeSelect}
               >
                 <MenuItem value={"today"}>Today</MenuItem>
                 <MenuItem value={"this week"}>This Week</MenuItem>
@@ -352,11 +357,10 @@ const StudentView = () => {
         <Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => console.log(rows, filter, userDetails.class)}
+          onClick={() => console.log(rowsPerPage, filter, userDetails.class)}
         >
           Test
         </Button>
-
       </Stack>
     </Box>
   );
