@@ -43,12 +43,12 @@ import ConfirmDelete from "../modals/ConfirmDelete";
 import Axios from "axios";
 
 const Timetable = () => {
-  // const user = useContext(AuthContext).user.userDetails;
-  const user = {
-    uid: "XnH9lDsLsEWqda1B1D2ScYxGu822",
-    name: "Vinura Chandrasekara",
-    email: "vinurachan@gmail.com",
-  };
+  const user = useContext(AuthContext).user.userDetails;
+  // const user = {
+  //   uid: "XnH9lDsLsEWqda1B1D2ScYxGu822",
+  //   name: "Vinura Chandrasekara",
+  //   email: "vinurachan@gmail.com",
+  // };
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(2),
@@ -389,7 +389,9 @@ const Timetable = () => {
   }, [saveData]);
 
   return (
-    <Box style={{ backgroundColor: "#D2DBEB", height: "100%" }}>
+    <Box
+      style={{ backgroundColor: "#D2DBEB", height: "100%", paddingBottom: 30 }}
+    >
       <Box sx={{ display: "flex", marginTop: "10vh" }}>
         <CssBaseline />
         <AppBar
