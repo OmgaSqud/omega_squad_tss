@@ -1,15 +1,22 @@
+import { useContext } from "react";
+import { auth } from "../firebase/Firebase";
+import { AuthContext } from "../firebase/AuthContext";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 const Navbar = () => {
+  const user = useContext(AuthContext).user.userDetails;
+  const location = useLocation();
   const history = useHistory();
   const [value, setValue] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -26,6 +33,15 @@ const Navbar = () => {
         {...props}
       />
     );
+  };
+
+  const signOut = () => {
+    setLoading(true);
+    setTimeout(() => {
+      auth.signOut();
+      history.push("/");
+      setLoading(false);
+    }, 2000);
   };
 
   return (
@@ -45,33 +61,33 @@ const Navbar = () => {
             MOMENT
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Box>
-            <Tabs
-              textColor={"white"}
-              TabIndicatorProps={{ style: { background: "#6BEFCD" } }}
-              value={value}
-              onChange={handleChange}
-              aria-label="nav tabs example"
-            >
-              <LinkTab label="Home" onClick={() => history.push("/")} />
-              <LinkTab
-                label="Student"
-                onClick={() => history.push("/student-view")}
-              />
-              <LinkTab
-                label="Teacher"
-                onClick={() => history.push("/dashboard")}
-              />
-              <LinkTab
-                label="New"
-                onClick={() => history.push("/add-user")}
-              />
-              <LinkTab
-                label="Edit"
-                onClick={() => history.push("/edit-user")}
-              />
-            </Tabs>
-          </Box>
+          {location.pathname === "/" || location.pathname === "/about" ? (
+            <Box>
+              <Tabs
+                textColor={"white"}
+                TabIndicatorProps={{ style: { background: "#6BEFCD" } }}
+                value={value}
+                onChange={handleChange}
+                aria-label="nav tabs example"
+              >
+                <LinkTab label="Home" onClick={() => history.push("/")} />
+                <LinkTab label="About" onClick={() => history.push("/about")} />
+              </Tabs>
+            </Box>
+          ) : (
+            <>
+              <Typography sx={{ fontSize: 20, marginRight: "3%" }}>
+                Welcome {user.name}
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{ marginRight: "2vw", backgroundColor: "darkslategray" }}
+                onClick={signOut}
+              >
+                {loading ? "Logging out.." : "Logout"}
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
