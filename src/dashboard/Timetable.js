@@ -169,12 +169,10 @@ const Timetable = () => {
 
   const zoomLink = async () => {
     let Class = grade + "-" + classroom;
-    let StartTime = !updateslot
-      ? timeperiods[slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod].split(
-          slotPeriod < 7 ? "AM" : "PM"
-        )[0]
-      : null;
-    let period = !updateslot ? slotPeriod : null;
+    let StartTime = timeperiods[
+      slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod
+    ].split(slotPeriod < 7 ? "AM" : "PM")[0];
+    let period = slotPeriod;
     let Topic = slotSubject + " " + Class;
     Axios.post("/timetable/newMeeting", {
       slotID: slotID,
@@ -237,6 +235,32 @@ const Timetable = () => {
     } else if (!Grade || !Class) {
       alert("Select  Grade & Class to save details");
     } else if (updateslot == true) {
+      if (startLink) {
+        let Class;
+        const docRef = doc(db, "timeslots", slotID);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          Class = docSnap.data().class;
+          console.log("Document data:", docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+        let StartTime = timeperiods[
+          slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod
+        ].split(slotPeriod < 7 ? "AM" : "PM")[0];
+        let period = slotPeriod;
+        let Topic = slotSubject + " " + Class;
+        Axios.post("/timetable/deletePeriod", {
+          slotID: slotID,
+          topic: Topic,
+          class: Class,
+          day: slotDay,
+          period: period,
+          startTime: StartTime,
+          subject: slotSubject,
+          teacher: user.name,
+        });
+      }
       let newclass = Grade + "-" + Class;
       const update = doc(db, "timeslots", slotID);
       await updateDoc(update, {
@@ -275,11 +299,31 @@ const Timetable = () => {
     setGrade(Class.split("-")[0]);
     setClassroom(Class.split("-")[1]);
     setModalTitle(subject + " - " + DayRetriever(i) + " Period " + Period);
+    setSlotDay(DayRetriever(i));
+    setSlotPeriod(Period);
     setOpenModal(true);
   };
 
   const deletePeriod = async (slotID) => {
     await deleteDoc(doc(db, "timeslots", slotID));
+    if (startLink) {
+      let Class = grade + "-" + classroom;
+      let StartTime = timeperiods[
+        slotPeriod <= 4 ? slotPeriod - 1 : slotPeriod
+      ].split(slotPeriod < 7 ? "AM" : "PM")[0];
+      let period = slotPeriod;
+      let Topic = slotSubject + " " + Class;
+      Axios.post("/timetable/deletePeriod", {
+        slotID: slotID,
+        topic: Topic,
+        class: Class,
+        day: slotDay,
+        period: period,
+        startTime: StartTime,
+        subject: slotSubject,
+        teacher: user.name,
+      });
+    }
     setSaveData(!saveData);
     setOpenModal3(false);
     setOpenModal(false);
