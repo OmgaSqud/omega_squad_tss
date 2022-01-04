@@ -40,7 +40,9 @@ const StudentView = () => {
   //----------------------------------------------------Table----------------------------------------------------
   const [rows, setRows] = useState([]);
 
-  const today = "Wednesday";
+  const currentDate = new Date();
+  var options = { weekday: "long" };
+  const today = new Intl.DateTimeFormat("en-US", options).format(currentDate);
 
   const [todayValue, setTodayValue] = useState(0);
 
@@ -288,7 +290,7 @@ const StudentView = () => {
     //   var d = new Date(b.dateTime);
     //   return c - d;
     // });
-    // array.sort((a, b) => (getDayValue(a.date) > getDayValue(b.date) ? 1 : -1));
+    array.sort((a, b) => (getDayValue(a.date) > getDayValue(b.date) ? 1 : -1));
     setRows(array);
   };
 
@@ -389,6 +391,7 @@ const StudentView = () => {
               filter,
               userDetails.class,
               todayValue,
+              today,
               rows
             )
           }
