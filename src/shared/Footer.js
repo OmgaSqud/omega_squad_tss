@@ -14,9 +14,12 @@ const Footer = () => {
           display: "flex",
           alignItems: "center",
           paddingLeft: "43vw",
+          position: "fixed",
+          width: "100%",
+          bottom: 0,
         }}
       >
-        Designed by Omega_Squad
+        Developed by Omega_Squad
       </Box>
     </footer>
   );
