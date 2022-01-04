@@ -40,7 +40,11 @@ const StudentView = () => {
   //----------------------------------------------------Table----------------------------------------------------
   const [rows, setRows] = useState([]);
 
-  const today = "Monday";
+  const currentDate = new Date();
+  var options = { weekday: "long" };
+  const today = new Intl.DateTimeFormat("en-US", options).format(currentDate);
+
+  const [todayValue, setTodayValue] = useState(0);
 
   function createData(date, time, subject, teacher, joinlink, dateTime) {
     return {
@@ -76,7 +80,11 @@ const StudentView = () => {
           <TableCell align="center">{row.subject}</TableCell>
           <TableCell align="center">{row.teacher}</TableCell>
           <TableCell align="center">
-            {row.joinlink == null ? (
+            {getDayValue(row.date) < todayValue ? (
+              <Button variant="text" disabled>
+                Completed
+              </Button>
+            ) : row.joinlink == null ? (
               <Button variant="text" disabled>
                 Pending
               </Button>
@@ -226,6 +234,24 @@ const StudentView = () => {
 
   //-------------------------------------------------------Functions and Queries--------------------------------------
 
+  const getDayValue = (day) => {
+    switch (day) {
+      case "Monday":
+        return 1;
+      case "Tuesday":
+        return 2;
+      case "Wednesday":
+        return 3;
+      case "Thursday":
+        return 4;
+      case "Friday":
+        return 5;
+
+      default:
+        break;
+    }
+  };
+
   const fetchDetails = async () => {
     setRows([]);
     let q;
@@ -264,11 +290,13 @@ const StudentView = () => {
     //   var d = new Date(b.dateTime);
     //   return c - d;
     // });
+    array.sort((a, b) => (getDayValue(a.date) > getDayValue(b.date) ? 1 : -1));
     setRows(array);
   };
 
   useEffect(() => {
     userDetails && fetchDetails();
+    setTodayValue(getDayValue(today));
   }, [filter, userDetails]);
 
   //----------------------------------------------------------------------------------------------------------------
@@ -357,7 +385,16 @@ const StudentView = () => {
         <Button
           variant="contained"
           sx={{ margin: "auto", marginTop: "20px" }}
-          onClick={() => console.log(rowsPerPage, filter, userDetails.class)}
+          onClick={() =>
+            console.log(
+              rowsPerPage,
+              filter,
+              userDetails.class,
+              todayValue,
+              today,
+              rows
+            )
+          }
         >
           Test
         </Button>
