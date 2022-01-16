@@ -1,12 +1,14 @@
 const port = 4000;
 const express = require("express");
+const path = require('path');
 const app = express();
 
 //Import Routes
 const timetableRoutes = require("./routes/timetableRoutes");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+// app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, '../../build')));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -20,5 +22,9 @@ app.use(express.json());
 
 //User Routes
 app.use("/timetable", timetableRoutes);
+
+app.get('/', (req,res) => {
+  res.sendFile(path.join(__dirname, '../../build/index.html'));
+});
 
 app.listen(port, () => console.log(`Zoom Server listening on Port: ${port}`));

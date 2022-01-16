@@ -38,7 +38,7 @@
     "eject": "react-scripts eject",
     "server": "cd src/server && npm start",
     "client": "react-scripts start",
-    "start": "concurrently \"npm run server\" \"npm run client\""
+    "start": "concurrently \"npm run server\""
   },
   "eslintConfig": {
     "extends": [
