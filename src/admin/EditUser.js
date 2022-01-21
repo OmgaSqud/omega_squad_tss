@@ -100,6 +100,7 @@ const EditUser = () => {
         console.log(doc.id, " => ", doc.data());
         const data = doc.data();
         const userData = { ...data };
+        console.log("userData: " + userData);
         if (doc.data().type == "student") {
           const grd = parseInt(doc.data().class + "");
           const cls = doc.data().class.slice(-1);
@@ -228,8 +229,7 @@ const EditUser = () => {
                 "& > :not(style)": {
                   margin: "0 auto",
                   mt: 2,
-                  ml: "10%",
-                  width: "80%",
+                  width: "90%",
                 },
               }}
               noValidate
@@ -252,8 +252,7 @@ const EditUser = () => {
                 "& > :not(style)": {
                   margin: "0 auto",
                   mt: 2,
-                  ml: "10%",
-                  width: "80%",
+                  width: "90%",
                 },
               }}
               noValidate
@@ -277,8 +276,7 @@ const EditUser = () => {
                 "& > :not(style)": {
                   margin: "0 auto",
                   mt: 2,
-                  ml: 14,
-                  width: "80%",
+                  width: "90%",
                 },
               }}
               noValidate
@@ -382,6 +380,9 @@ const EditUser = () => {
                                 name="maths"
                                 id="maths"
                                 value="Com.Maths"
+                                checked={
+                                  details.subjects.indexOf("Com.Maths") > -1
+                                }
                               />
                             }
                             label="Com.Maths"
@@ -393,6 +394,9 @@ const EditUser = () => {
                                 name="chem"
                                 id="chem"
                                 value="Chemistry"
+                                checked={
+                                  details.subjects.indexOf("Chemistry") > -1
+                                }
                               />
                             }
                             label="Chemistry"
@@ -403,6 +407,9 @@ const EditUser = () => {
                                 name="agr"
                                 id="agr"
                                 value="Agriculture"
+                                checked={
+                                  details.subjects.indexOf("Agriculture") > -1
+                                }
                               />
                             }
                             label="Agriculture"
@@ -413,19 +420,38 @@ const EditUser = () => {
                         <FormGroup>
                           <FormControlLabel
                             control={
-                              <Checkbox name="bio" id="bio" value="Biology" />
+                              <Checkbox
+                                name="bio"
+                                id="bio"
+                                value="Biology"
+                                checked={
+                                  details.subjects.indexOf("Biology") > -1
+                                }
+                              />
                             }
                             label="Biology"
                           />
                           <FormControlLabel
                             control={
-                              <Checkbox name="eng" id="eng" value="English" />
+                              <Checkbox
+                                name="eng"
+                                id="eng"
+                                value="English"
+                                checked={
+                                  details.subjects.indexOf("English") > -1
+                                }
+                              />
                             }
                             label="English"
                           />
                           <FormControlLabel
                             control={
-                              <Checkbox name="ict" id="ict" value="ICT" />
+                              <Checkbox
+                                name="ict"
+                                id="ict"
+                                value="ICT"
+                                checked={details.subjects.indexOf("ICT") > -1}
+                              />
                             }
                             label="ICT"
                           />
@@ -435,13 +461,25 @@ const EditUser = () => {
                         <FormGroup>
                           <FormControlLabel
                             control={
-                              <Checkbox name="psc" id="psc" value="Physics" />
+                              <Checkbox
+                                name="psc"
+                                id="psc"
+                                value="Physics"
+                                checked={
+                                  details.subjects.indexOf("Physics") > -1
+                                }
+                              />
                             }
                             label="Physics"
                           />
                           <FormControlLabel
                             control={
-                              <Checkbox name="git" id="git" value="GIT" />
+                              <Checkbox
+                                name="git"
+                                id="git"
+                                value="GIT"
+                                checked={details.subjects.indexOf("GIT") > -1}
+                              />
                             }
                             label="GIT"
                           />
@@ -464,6 +502,16 @@ const EditUser = () => {
                 onClick={clear}
               >
                 Clear
+              </Button>
+
+              <Button
+                variant="contained"
+                sx={{ width: "100px", marginLeft: "10vh" }}
+                onClick={() => {
+                  console.log(details.subjects);
+                }}
+              >
+                Test
               </Button>
 
               <Button

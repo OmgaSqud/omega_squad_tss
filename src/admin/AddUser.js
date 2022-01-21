@@ -239,7 +239,7 @@ const AddUser = () => {
                 "& > :not(style)": {
                   margin: "0 auto",
                   mt: 2,
-                  ml: 14,
+                  ml: "10%",
                   width: "80%",
                 },
               }}
