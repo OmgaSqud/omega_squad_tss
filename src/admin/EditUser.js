@@ -20,170 +20,467 @@ import Paper from "@mui/material/Paper";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+//---------------------------------------------------------------------------------
 
-const UsersList = () => {
-  const [type, settype] = React.useState("");
+//-----------------------------------------------------------------------------------
+import { doc, getDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+//-----------------------------------------------------------------------------------
 
-  const [cls, setcls] = React.useState("");
+//---------------------------------------------------------------------------------
+import { useHistory } from "react-router";
+import { ButtonGroup } from "@mui/material";
+
+const EditUser = () => {
+  const history = useHistory();
+
+  //-------------------------------------------------------------
+  const clear = () => {
+    setDetails({
+      name: "",
+      email: "",
+      password: "",
+      type: "",
+      subjects: [],
+      grade: "",
+      class: "",
+    });
+  };
+
+  const [details, setDetails] = useState({
+    name: "",
+    email: "",
+    password: "",
+    type: "",
+    subjects: [],
+    grade: "",
+    class: "",
+  });
+
+  const setValue = (e) =>
+    setDetails((details) => ({ ...details, [e.target.name]: e.target.value }));
+  //-----------------------------------------------------------
+
+  const [searchArray, setSearchArray] = useState([]); // search bar data
+
+  useEffect(() => {
+    getDocs(
+      query(collection(db, "users"), where("type", "==", details.type))
+    ).then((query) => {
+      query.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        searchArray.push({ label: doc.data().name, uid: doc.id });
+      });
+    });
+  }, [details.type]);
 
   const names = ["Manishyam", "Nimasha", "Vinura"];
 
-  const handleChangeCls = (event) => {
-    setcls(event.target.value);
+  const [selectUser, setSelectUser] = useState({ name: "", uid: "" });
+
+  useEffect(() => {
+    console.log("use changed " + selectUser.uid);
+    // if (selectUser.uid != null) {
+    //   getDoc(doc(db, "users", selectUser.uid)).then((doc) => {
+    //     const data = doc.data();
+    //     console.log(data);
+    //   });
+    // }
+    getDocs(
+      query(collection(db, "users"), where("uid", "==", selectUser.uid))
+    ).then((query) => {
+      query.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        const data = doc.data();
+        const userData = { ...data };
+        if (doc.data().type == "student") {
+          const grd = parseInt(doc.data().class + "");
+          const cls = doc.data().class.slice(-1);
+          console.log("class letter: " + cls);
+          setDetails({
+            uid: selectUser.uid,
+            ...userData,
+            grade: grd,
+            class: cls,
+          });
+        }
+        setDetails({
+          uid: selectUser.uid,
+          ...userData,
+        });
+
+        console.log("details : " + details);
+      });
+    });
+  }, [selectUser]);
+
+  const handleUpdate = () => {
+    updateDoc(doc(db, "users", selectUser.uid), {
+      ...details,
+    });
   };
 
-  const handleChangeType = (event) => {
-    settype(event.target.value);
-  };
   return (
     <Box
       sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
     >
-      <Grid container spacing={0}>
-        <Grid item xs={3}>
-          <Box class="adminBgLeft">
-            <Box textAlign="center" sx={{ paddingTop: "20vh" }}>
-              <Typography variant="h5" gutterBottom component="div">
-                Select Option
-              </Typography>
+      <div class="block" style={{ marginTop: "3vh" }}>
+        <ButtonGroup
+          fullWidth
+          variant="text"
+          size="large"
+          aria-label="outlined button group"
+        >
+          <Button onClick={() => history.push("/add-user")}>Add User</Button>
+          <Button disabled>Edit User</Button>
+        </ButtonGroup>
+        <Box sx={{ flexGrow: 1, padding: "20px 20px 0px 60px" }}>
+          <Grid container spacing={2}>
+            <Grid item xs={3}>
+              <Box sx={{ minWidth: 120, margin: "0px auto" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Type</InputLabel>
+
+                  <Select
+                    name="type"
+                    labelId="type"
+                    id="type"
+                    label="type"
+                    sx={{ backgroundColor: "white" }}
+                    fullWidth
+                    value={details.type}
+                    onChange={(e) => {
+                      setValue(e);
+                      setSearchArray([]);
+                    }}
+                  >
+                    <MenuItem value="student">Student</MenuItem>
+                    <MenuItem value="teacher">Teacher</MenuItem>
+                    <MenuItem value="admin">Admin</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box sx={{ minWidth: 120, margin: "0px auto" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Class</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={details.class}
+                    label="cls"
+                    onChange={setValue}
+                    sx={{ backgroundColor: "white" }}
+                  >
+                    <MenuItem value={"6"}>6</MenuItem>
+                    <MenuItem value={"7"}>7</MenuItem>
+                    <MenuItem value={"8"}>8</MenuItem>
+                    <MenuItem value={"9"}>9</MenuItem>
+                    <MenuItem value={"10"}>10</MenuItem>
+                    <MenuItem value={"11"}>11</MenuItem>
+                    <MenuItem value={"12"}>12</MenuItem>
+                    <MenuItem value={"13"}>13</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Autocomplete
+                // value={selectUser}
+                onChange={(event, newValue) => {
+                  setSelectUser(newValue);
+                  console.log(newValue);
+                }}
+                disablePortal
+                id="highlights-demo"
+                sx={{
+                  width: 200,
+                  margin: "-16px auto 0px",
+                }}
+                options={searchArray}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Name"
+                    margin="normal"
+                    sx={{ backgroundColor: "white", borderRadius: "5px" }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+
+          {/**=================================================================================================== */}
+
+          {/* <label>User Category</label> */}
+          <Box fullWidth>
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: "10%",
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                fullWidth
+                name="name"
+                id="outlined-basic"
+                label="Name"
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                value={details.name}
+                onChange={setValue}
+              />
             </Box>
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: "10%",
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                name="email"
+                id="outlined-basic"
+                label="Email"
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                fullWidth
+                value={details.email}
+                onChange={setValue}
+              />
+            </Box>
+
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: 14,
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                name="password"
+                label="Password"
+                placeholder="Enter Password"
+                type="password"
+                fullWidth
+                required
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                value={details.password}
+                onChange={setValue}
+              ></TextField>
+            </Box>
+
+            {details.type === "student" ? (
+              <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        margin: "20px 20%",
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Select Grade
+                        </InputLabel>
+                        <Select
+                          name="grade"
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="grade"
+                          sx={{ backgroundColor: "white" }}
+                          value={details.grade}
+                          onChange={setValue}
+                        >
+                          <MenuItem value={"6"}>6</MenuItem>
+                          <MenuItem value={"7"}>7</MenuItem>
+                          <MenuItem value={"8"}>8</MenuItem>
+                          <MenuItem value={"9"}>9</MenuItem>
+                          <MenuItem value={"10"}>10</MenuItem>
+                          <MenuItem value={"11"}>11</MenuItem>
+                          <MenuItem value={"12"}>12</MenuItem>
+                          <MenuItem value={"13"}>13</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        margin: "20px 10%",
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Select class
+                        </InputLabel>
+                        <Select
+                          name="class"
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="class"
+                          sx={{ backgroundColor: "white" }}
+                          value={details.class}
+                          onChange={setValue}
+                        >
+                          <MenuItem value={"A"}>A</MenuItem>
+                          <MenuItem value={"B"}>B</MenuItem>
+                          <MenuItem value={"C"}>C</MenuItem>
+                          <MenuItem value={"D"}>D</MenuItem>
+                          <MenuItem value={"E"}>E</MenuItem>
+                          <MenuItem value={"F"}>F</MenuItem>
+                          <MenuItem value={"G"}>G</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
+            ) : (
+              details.type === "teacher" && (
+                <Box sx={{ marginTop: "20px" }}>
+                  <label style={{ margin: "20px 10%", fontWeight: "bold" }}>
+                    Subjects
+                  </label>
+                  <Box sx={{ flexGrow: 1, marginLeft: "10%" }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="maths"
+                                id="maths"
+                                value="Com.Maths"
+                              />
+                            }
+                            label="Com.Maths"
+                          />
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="chem"
+                                id="chem"
+                                value="Chemistry"
+                              />
+                            }
+                            label="Chemistry"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="agr"
+                                id="agr"
+                                value="Agriculture"
+                              />
+                            }
+                            label="Agriculture"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox name="bio" id="bio" value="Biology" />
+                            }
+                            label="Biology"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox name="eng" id="eng" value="English" />
+                            }
+                            label="English"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox name="ict" id="ict" value="ICT" />
+                            }
+                            label="ICT"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox name="psc" id="psc" value="Physics" />
+                            }
+                            label="Physics"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox name="git" id="git" value="GIT" />
+                            }
+                            label="GIT"
+                          />
+                        </FormGroup>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
+              )
+            )}
+
             <Stack
-              spacing={2}
-              direction="column"
-              sx={{ alignItems: "center", marginTop: "30px" }}
+              spacing={40}
+              direction="row"
+              style={{ marginTop: "10px", marginBottom: "10px" }}
             >
               <Button
                 variant="contained"
-                sx={{
-                  width: "80%",
-                  backgroundColor: "#353535",
-                  "&:hover": {
-                    backgroundColor: "#464646",
-                    // color: "#3c52b2",
-                  },
-                }}
+                sx={{ width: "100px", marginLeft: "10vh" }}
+                onClick={clear}
               >
-                Add User
+                Clear
               </Button>
+
               <Button
-                variant="outlined"
-                disabled="true"
-                sx={{
-                  width: "80%",
-                  borderColor: "#353535",
-                  color: "#353535",
+                variant="contained"
+                onClick={() => {
+                  handleUpdate();
                 }}
               >
-                Edit User
+                Update
               </Button>
             </Stack>
           </Box>
-        </Grid>
-        <Grid item xs={9}>
-          <Box class="adminBgRight">
-            <Box textAlign="center" sx={{ paddingTop: "30px" }}>
-              <Typography variant="h4" gutterBottom component="div">
-                User Management
-              </Typography>
-            </Box>
-            <Box sx={{ flexGrow: 1, padding: "20px 20px 0px 60px" }}>
-              <Grid container spacing={2}>
-                <Grid item xs={3}>
-                  <Box sx={{ minWidth: 120, margin: "0px auto" }}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Type
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={type}
-                        label="type"
-                        onChange={handleChangeType}
-                        sx={{ backgroundColor: "white" }}
-                      >
-                        <MenuItem value={"student"}>Student</MenuItem>
-                        <MenuItem value={"teacher"}>Teacher</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid item xs={3}>
-                  <Box sx={{ minWidth: 120, margin: "0px auto" }}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Class
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={cls}
-                        label="cls"
-                        onChange={handleChangeCls}
-                        sx={{ backgroundColor: "white" }}
-                      >
-                        <MenuItem value={"6"}>6</MenuItem>
-                        <MenuItem value={"7"}>7</MenuItem>
-                        <MenuItem value={"8"}>8</MenuItem>
-                        <MenuItem value={"9"}>9</MenuItem>
-                        <MenuItem value={"10"}>10</MenuItem>
-                        <MenuItem value={"11"}>11</MenuItem>
-                        <MenuItem value={"12"}>12</MenuItem>
-                        <MenuItem value={"13"}>13</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Autocomplete
-                    id="highlights-demo"
-                    sx={{
-                      width: 400,
-                      margin: "-16px auto 0px",
-                    }}
-                    options={names}
-                    getOptionLabel={(option) => option}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Search"
-                        margin="normal"
-                        sx={{ backgroundColor: "white", borderRadius: "5px" }}
-                      />
-                    )}
-                    renderOption={(props, option, { inputValue }) => {
-                      const matches = AutosuggestHighlightMatch(
-                        option,
-                        inputValue
-                      );
-                      const parts = AutosuggestHighlightParse(option, matches);
-
-                      return (
-                        <li {...props}>
-                          <div>
-                            {parts.map((part, index) => (
-                              <span
-                                key={index}
-                                style={{
-                                  fontWeight: part.highlight ? 700 : 400,
-                                }}
-                              >
-                                {part.text}
-                              </span>
-                            ))}
-                          </div>
-                        </li>
-                      );
-                    }}
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+        </Box>
+        {/**=================================================================================================== */}
+      </div>
     </Box>
   );
 };
 
-export default UsersList;
+export default EditUser;

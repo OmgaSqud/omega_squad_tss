@@ -51,3 +51,17 @@ section {
   background-color: #d2dbeb;
   height: 85vh;
 }
+
+.block {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+
+  background-color: #f3f5fa;
+  padding-top: 20px;
+  width: 50vw;
+  display: inline-block;
+}

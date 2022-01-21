@@ -10,7 +10,12 @@ import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { auth, db } from "../firebase/Firebase";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
+import Alert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import Collapse from "@mui/material/Collapse";
+import CloseIcon from "@mui/icons-material/Close";
 //-----------------------------------------------------------------------------------
 import { doc, getDoc } from "firebase/firestore";
 import {
@@ -26,9 +31,9 @@ const HomePage = () => {
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordlError] = useState("");
+  const [Error, setError] = useState("");
   const [hasAccount, sethasAccount] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const history = useHistory();
 
@@ -37,8 +42,7 @@ const HomePage = () => {
     setPassword("");
   };
   const clearError = () => {
-    setEmailError("");
-    setPasswordlError("");
+    setError("");
   };
 
   const handleLogin = () => {
@@ -68,44 +72,23 @@ const HomePage = () => {
         });
         //----------------------------------------------------------------
 
-        //history.push("/student");
-
-        // ...
-        //--------------------------------------------------------
-        // db.collection("users")
-        //   .doc(user.uid)
-        //   .getDoc()
-        //   .then((doc) => {
-        //     console.log(doc.data().type);
-        //     switch (doc.data().type) {
-        //       case "student":
-        //         history.push("/student");
-        //         break;
-        //       case "Teacher":
-        //         history.push("/dashboard");
-        //         break;
-        //       case "ADMIN":
-        //         history.push("/admin");
-        //         break;
-        //       default:
-        //         history.push("/");
-        //         break;
-        //     }
-        //   });
-
-        //console.log("doc data" + getDoc(doc(db, "users", "user.uid")).data());
-
         //-------------------------------------------------------
       })
       .catch((err) => {
+        setOpen(true);
+        console.log(err.message);
         switch (err.code) {
           case "auth/invalid-email":
-          case "auth/user-disabled":
           case "auth/user-not-found":
-            setEmailError(err.message);
+          case "auth/wrong-password":
+            setError("Invalid Login. Check Password and email");
             break;
-          case "auth/wring-password":
-            setPasswordlError(err.message);
+          case "auth/user-disabled":
+          case "user-disabled":
+            setError("Disabled user");
+            break;
+          case "auth/internal-error":
+            setError("Invalid Login. Check Password and email");
             break;
           default:
             history.push("/");
@@ -144,6 +127,21 @@ const HomePage = () => {
     margin: "12px 0",
   };
 
+  const handleForgetPassword = () => {
+    const auth = getAuth();
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent!
+        console.log("email sent");
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
+  };
+
   return (
     <section id="hero">
       <div className="container">
@@ -177,7 +175,6 @@ const HomePage = () => {
               onKeyDown={(e)=> (e.code === "Enter" ? handleLogin() : null)}
               onChange={(e) => setPassword(e.target.value)}
             ></TextField>
-            <p>{passwordError} </p>
             <Button
               type="submit"
               color="secondary"
@@ -189,8 +186,31 @@ const HomePage = () => {
               Sign In
             </Button>
             <Typography style={marginStyle}>
-              <Link href="#">Forget Password ?</Link>
+              <Link href="#" onClick={handleForgetPassword}>
+                Forget Password ?
+              </Link>
             </Typography>
+            {/* =========================================================================== */}
+            <Collapse in={open}>
+              <Alert
+                severity="error"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                {Error}
+              </Alert>
+            </Collapse>
+            {/* =========================================================================== */}
           </Paper>
         </Grid>
       </div>
