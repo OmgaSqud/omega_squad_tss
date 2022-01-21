@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -6,6 +7,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useHistory } from "react-router";
+
+//------------------------------------------------
+import { getAuth, signOut } from "firebase/auth";
+//-----------------------------------------------
 
 const Navbar = () => {
   const history = useHistory();
@@ -28,6 +33,20 @@ const Navbar = () => {
     );
   };
 
+  //----------------------------------------------------------
+
+  const handlesignOut = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        history.push("/");
+      })
+      .catch((error) => {
+        // An error happened.
+      });
+  };
+  //---------------------------------------------------------
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -62,14 +81,12 @@ const Navbar = () => {
                 label="Teacher"
                 onClick={() => history.push("/dashboard")}
               />
-              <LinkTab
-                label="New"
-                onClick={() => history.push("/add-user")}
-              />
+              <LinkTab label="New" onClick={() => history.push("/add-user")} />
               <LinkTab
                 label="Edit"
                 onClick={() => history.push("/edit-user")}
               />
+              <Button onClick={handlesignOut}>Sign out</Button>
             </Tabs>
           </Box>
         </Toolbar>

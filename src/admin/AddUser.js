@@ -21,8 +21,11 @@ import Checkbox from "@mui/material/Checkbox";
 //-------------------------------------------------------------------------------
 import { doc, setDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useHistory } from "react-router";
+import { ButtonGroup } from "@mui/material";
 
 const AddUser = () => {
+  const history = useHistory();
   const clear = () => {
     setDetails({
       name: "",
@@ -57,6 +60,7 @@ const AddUser = () => {
         const user = userCredential.user;
         if (details.type == "student") {
           setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
             name: details.name,
             email: details.email,
             password: details.password,
@@ -65,6 +69,7 @@ const AddUser = () => {
           });
         } else if (details.type == "teacher") {
           setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
             name: details.name,
             email: details.email,
             password: details.password,
@@ -73,6 +78,7 @@ const AddUser = () => {
           });
         } else if (details.type == "admin") {
           setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
             name: details.name,
             email: details.email,
             password: details.password,
@@ -146,364 +152,320 @@ const AddUser = () => {
     <Box
       sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
     >
-      <Grid container spacing={0}>
-        <Grid item xs={3}>
-          <Box class="adminBgLeft">
-            <Box textAlign="center" sx={{ paddingTop: "20vh" }}>
-              <Typography variant="h5" gutterBottom component="div">
-                Select Option
-              </Typography>
+      <div class="block" style={{ marginTop: "3vh" }}>
+        <ButtonGroup
+          fullWidth
+          variant="text"
+          size="large"
+          aria-label="outlined button group"
+        >
+          <Button disabled>Add User</Button>
+          <Button onClick={() => history.push("/edit-user")}>Edit User</Button>
+        </ButtonGroup>
+        <Box>
+          <Box sx={{ padding: "20px" }}>
+            {/* <label>User Category</label> */}
+            <Box sx={{ width: "80%", margin: "0 auto" }}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">User Type</InputLabel>
+                <Select
+                  name="type"
+                  labelId="demo-simple-select-label"
+                  id="type"
+                  label="newUser"
+                  sx={{ backgroundColor: "white" }}
+                  fullWidth
+                  value={details.type}
+                  onChange={setValue}
+                >
+                  <MenuItem value={"teacher"}>Teacher</MenuItem>
+                  <MenuItem value={"student"}>Student</MenuItem>
+                  <MenuItem value={"admin"}>Admin</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
-            <Stack
-              spacing={2}
-              direction="column"
-              sx={{ alignItems: "center", marginTop: "30px" }}
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: "10%",
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
             >
+              <TextField
+                name="name"
+                id="outlined-basic"
+                label="Name"
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                fullWidth
+                value={details.name}
+                onChange={setValue}
+              />
+            </Box>
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: "10%",
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                name="email"
+                id="outlined-basic"
+                label="Email"
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                fullWidth
+                value={details.email}
+                onChange={setValue}
+              />
+            </Box>
+
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": {
+                  margin: "0 auto",
+                  mt: 2,
+                  ml: 14,
+                  width: "80%",
+                },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                name="password"
+                label="Password"
+                placeholder="Enter Password"
+                type="password"
+                fullWidth
+                required
+                variant="outlined"
+                sx={{ backgroundColor: "white" }}
+                value={details.password}
+                onChange={setValue}
+              ></TextField>
+            </Box>
+
+            {details.type === "student" ? (
+              <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        margin: "20px 20%",
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Select Grade
+                        </InputLabel>
+                        <Select
+                          name="grade"
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="grade"
+                          sx={{ backgroundColor: "white" }}
+                          value={details.grade}
+                          onChange={setValue}
+                        >
+                          <MenuItem value={"6"}>6</MenuItem>
+                          <MenuItem value={"7"}>7</MenuItem>
+                          <MenuItem value={"8"}>8</MenuItem>
+                          <MenuItem value={"9"}>9</MenuItem>
+                          <MenuItem value={"10"}>10</MenuItem>
+                          <MenuItem value={"11"}>11</MenuItem>
+                          <MenuItem value={"12"}>12</MenuItem>
+                          <MenuItem value={"13"}>13</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        margin: "20px 10%",
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Select class
+                        </InputLabel>
+                        <Select
+                          name="class"
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="class"
+                          sx={{ backgroundColor: "white" }}
+                          value={details.class}
+                          onChange={setValue}
+                        >
+                          <MenuItem value={"A"}>A</MenuItem>
+                          <MenuItem value={"B"}>B</MenuItem>
+                          <MenuItem value={"C"}>C</MenuItem>
+                          <MenuItem value={"D"}>D</MenuItem>
+                          <MenuItem value={"E"}>E</MenuItem>
+                          <MenuItem value={"F"}>F</MenuItem>
+                          <MenuItem value={"G"}>G</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
+            ) : (
+              details.type === "teacher" && (
+                <Box sx={{ marginTop: "20px" }}>
+                  <label style={{ margin: "20px 10%", fontWeight: "bold" }}>
+                    Subjects
+                  </label>
+                  <Box sx={{ flexGrow: 1, marginLeft: "10%" }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="maths"
+                                id="maths"
+                                value="Com.Maths"
+                                checked={subjects.maths}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="Com.Maths"
+                          />
+                          {/*<p>maths: {subjects.maths ? "true" : "false"}</p>*/}
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="chem"
+                                id="chem"
+                                value="Chemistry"
+                                checked={subjects.chem}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="Chemistry"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="agr"
+                                id="agr"
+                                value="Agriculture"
+                                checked={subjects.agr}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="Agriculture"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="bio"
+                                id="bio"
+                                value="Biology"
+                                checked={subjects.bio}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="Biology"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="eng"
+                                id="eng"
+                                value="English"
+                                checked={subjects.eng}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="English"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="ict"
+                                id="ict"
+                                value="ICT"
+                                checked={subjects.ict}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="ICT"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="psc"
+                                id="psc"
+                                value="Physics"
+                                checked={subjects.psc}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="Physics"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name="git"
+                                id="git"
+                                value="GIT"
+                                checked={subjects.git}
+                                onClick={setSubjectValue}
+                              />
+                            }
+                            label="GIT"
+                          />
+                        </FormGroup>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
+              )
+            )}
+
+            <Stack spacing={40} direction="row" style={{ marginTop: "10px" }}>
               <Button
                 variant="contained"
-                sx={{
-                  width: "80%",
-                  backgroundColor: "#353535",
-                  "&:hover": {
-                    backgroundColor: "#464646",
-                    // color: "#3c52b2",
-                  },
-                }}
+                sx={{ width: "100px", marginLeft: "10vh" }}
+                onClick={clear}
               >
-                Edit User
+                Clear
               </Button>
-              <Button
-                variant="outlined"
-                disabled="true"
-                sx={{
-                  width: "80%",
-                  borderColor: "#353535",
-                  color: "#353535",
-                }}
-              >
+              <Button variant="contained" onClick={handleAddUser}>
                 Add User
               </Button>
             </Stack>
           </Box>
-        </Grid>
-        <Grid item xs={9}>
-          <Box class="adminBgRight">
-            <Box textAlign="center" sx={{ paddingTop: "30px" }}>
-              <Typography variant="h4" gutterBottom component="div">
-                User Management
-              </Typography>
-              {/**--------------------------------------------------------------------------------------------------------
-               * ---------------------------------------------------------------------------------------------------------
-               */}
-            </Box>
-            <Box>
-              <Box sx={{ padding: "20px" }}>
-                {/* <label>User Category</label> */}
-                <Box sx={{ width: "80%", margin: "0 auto" }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      User Type
-                    </InputLabel>
-                    <Select
-                      name="type"
-                      labelId="demo-simple-select-label"
-                      id="type"
-                      label="newUser"
-                      sx={{ backgroundColor: "white" }}
-                      fullWidth
-                      value={details.type}
-                      onChange={setValue}
-                    >
-                      <MenuItem value={"teacher"}>Teacher</MenuItem>
-                      <MenuItem value={"student"}>Student</MenuItem>
-                      <MenuItem value={"admin"}>Admin</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box
-                  component="form"
-                  sx={{
-                    "& > :not(style)": {
-                      margin: "0 auto",
-                      mt: 2,
-                      ml: "10%",
-                      width: "80%",
-                    },
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <TextField
-                    name="name"
-                    id="outlined-basic"
-                    label="Name"
-                    variant="outlined"
-                    sx={{ backgroundColor: "white" }}
-                    fullWidth
-                    value={details.name}
-                    onChange={setValue}
-                  />
-                </Box>
-                <Box
-                  component="form"
-                  sx={{
-                    "& > :not(style)": {
-                      margin: "0 auto",
-                      mt: 2,
-                      ml: "10%",
-                      width: "80%",
-                    },
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <TextField
-                    name="email"
-                    id="outlined-basic"
-                    label="Email"
-                    variant="outlined"
-                    sx={{ backgroundColor: "white" }}
-                    fullWidth
-                    value={details.email}
-                    onChange={setValue}
-                  />
-                </Box>
-
-                <Box
-                  component="form"
-                  sx={{
-                    "& > :not(style)": {
-                      margin: "0 auto",
-                      mt: 2,
-                      ml: 14,
-                      width: "80%",
-                    },
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <TextField
-                    name="password"
-                    label="Password"
-                    placeholder="Enter Password"
-                    type="password"
-                    fullWidth
-                    required
-                    variant="outlined"
-                    sx={{ backgroundColor: "white" }}
-                    value={details.password}
-                    onChange={setValue}
-                  ></TextField>
-                </Box>
-
-                {details.type === "student" ? (
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Box
-                          sx={{
-                            width: "30%",
-                            margin: "20px 20%",
-                          }}
-                        >
-                          <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">
-                              Select Grade
-                            </InputLabel>
-                            <Select
-                              name="grade"
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              label="grade"
-                              sx={{ backgroundColor: "white" }}
-                              value={details.grade}
-                              onChange={setValue}
-                            >
-                              <MenuItem value={"6"}>6</MenuItem>
-                              <MenuItem value={"7"}>7</MenuItem>
-                              <MenuItem value={"8"}>8</MenuItem>
-                              <MenuItem value={"9"}>9</MenuItem>
-                              <MenuItem value={"10"}>10</MenuItem>
-                              <MenuItem value={"11"}>11</MenuItem>
-                              <MenuItem value={"12"}>12</MenuItem>
-                              <MenuItem value={"13"}>13</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box
-                          sx={{
-                            width: "30%",
-                            margin: "20px 10%",
-                          }}
-                        >
-                          <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">
-                              Select class
-                            </InputLabel>
-                            <Select
-                              name="class"
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              label="class"
-                              sx={{ backgroundColor: "white" }}
-                              value={details.class}
-                              onChange={setValue}
-                            >
-                              <MenuItem value={"A"}>A</MenuItem>
-                              <MenuItem value={"B"}>B</MenuItem>
-                              <MenuItem value={"C"}>C</MenuItem>
-                              <MenuItem value={"D"}>D</MenuItem>
-                              <MenuItem value={"E"}>E</MenuItem>
-                              <MenuItem value={"F"}>F</MenuItem>
-                              <MenuItem value={"G"}>G</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                ) : (
-                  details.type === "teacher" && (
-                    <Box sx={{ marginTop: "20px" }}>
-                      <label style={{ margin: "20px 10%", fontWeight: "bold" }}>
-                        Subjects
-                      </label>
-                      <Box sx={{ flexGrow: 1, marginLeft: "10%" }}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={4}>
-                            <FormGroup>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="maths"
-                                    id="maths"
-                                    value="Com.Maths"
-                                    checked={subjects.maths}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="Com.Maths"
-                              />
-                              <p>maths: {subjects.maths ? "true" : "false"}</p>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="chem"
-                                    id="chem"
-                                    value="Chemistry"
-                                    checked={subjects.chem}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="Chemistry"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="agr"
-                                    id="agr"
-                                    value="Agriculture"
-                                    checked={subjects.agr}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="Agriculture"
-                              />
-                            </FormGroup>
-                          </Grid>
-                          <Grid item xs={4}>
-                            <FormGroup>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="bio"
-                                    id="bio"
-                                    value="Biology"
-                                    checked={subjects.bio}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="Biology"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="eng"
-                                    id="eng"
-                                    value="English"
-                                    checked={subjects.eng}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="English"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="ict"
-                                    id="ict"
-                                    value="ICT"
-                                    checked={subjects.ict}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="ICT"
-                              />
-                            </FormGroup>
-                          </Grid>
-                          <Grid item xs={4}>
-                            <FormGroup>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="psc"
-                                    id="psc"
-                                    value="Physics"
-                                    checked={subjects.psc}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="Physics"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="git"
-                                    id="git"
-                                    value="GIT"
-                                    checked={subjects.git}
-                                    onClick={setSubjectValue}
-                                  />
-                                }
-                                label="GIT"
-                              />
-                            </FormGroup>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </Box>
-                  )
-                )}
-
-                <Stack spacing={2} direction="row" sx={{ margin: "20px 40%" }}>
-                  <Button
-                    variant="contained"
-                    sx={{ width: "100px" }}
-                    onClick={clear}
-                  >
-                    Clear
-                  </Button>
-                  <Button variant="contained" onClick={handleAddUser}>
-                    Add User
-                  </Button>
-                </Stack>
-              </Box>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+        </Box>
+      </div>
     </Box>
   );
 };
