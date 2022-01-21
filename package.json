@@ -1,6 +1,7 @@
 {
   "name": "omega_squad_tss",
   "version": "0.1.0",
+  "description": "Frontend program for Timetable Scheduling System",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.4.1",

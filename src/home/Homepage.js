@@ -114,11 +114,11 @@ const HomePage = () => {
 
   const paperStyle = {
     padding: 20,
-    height: "570px",
+    height: "65vh",
     width: 400,
     margin: "50px auto",
     position: "relative",
-    verflow: "hidden",
+    overflow: "hidden",
   };
   const avatarStyle = {
     backgroundColor: "rgb(217 7 113)",
@@ -172,6 +172,7 @@ const HomePage = () => {
               required
               style={marginStyle}
               value={password}
+              onKeyDown={(e)=> (e.code === "Enter" ? handleLogin() : null)}
               onChange={(e) => setPassword(e.target.value)}
             ></TextField>
             <Button
