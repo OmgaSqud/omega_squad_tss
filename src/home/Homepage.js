@@ -55,6 +55,8 @@ const HomePage = () => {
         const user = userCredential.user;
         console.log(user.uid);
         getDoc(doc(db, "users", user.uid)).then((doc) => {
+          window.localStorage.setItem("uid", doc.data().uid);
+          window.localStorage.setItem("uname", doc.data().name);
           switch (doc.data().type) {
             case "student":
               history.push("/student-view");
@@ -70,6 +72,7 @@ const HomePage = () => {
               break;
           }
         });
+
         //----------------------------------------------------------------
 
         //-------------------------------------------------------
@@ -172,7 +175,7 @@ const HomePage = () => {
               required
               style={marginStyle}
               value={password}
-              onKeyDown={(e)=> (e.code === "Enter" ? handleLogin() : null)}
+              onKeyDown={(e) => (e.code === "Enter" ? handleLogin() : null)}
               onChange={(e) => setPassword(e.target.value)}
             ></TextField>
             <Button
