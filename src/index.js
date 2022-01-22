@@ -9,6 +9,7 @@ import { AuthProvider } from "./firebase/AuthContext";
 import reportWebVitals from "./reportWebVitals";
 import Axios from "axios";
 Axios.defaults.baseURL = "https://omega-squad-tss-backend.herokuapp.com";
+// Axios.defaults.baseURL = "http://localhost:4000";
 
 const theme = createTheme({});
 

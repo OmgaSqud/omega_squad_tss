@@ -12,7 +12,8 @@ import * as React from "react";
 import { useHistory, useLocation } from "react-router";
 
 const Navbar = () => {
-  const user = useContext(AuthContext).user.userDetails;
+  // const user = useContext(AuthContext).user.userDetails;
+  const userName = window.localStorage.getItem("uname");
   const location = useLocation();
   const history = useHistory();
   const [value, setValue] = React.useState(0);
@@ -41,6 +42,7 @@ const Navbar = () => {
       auth.signOut();
       history.push("/");
       setLoading(false);
+      window.localStorage.clear();
     }, 2000);
   };
 
@@ -77,7 +79,7 @@ const Navbar = () => {
           ) : (
             <>
               <Typography sx={{ fontSize: 20, marginRight: "3%" }}>
-                Welcome {user.name}
+                Welcome {userName}
               </Typography>
               <Button
                 variant="contained"

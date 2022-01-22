@@ -23,10 +23,10 @@ export default function BasicCard() {
             >
               About
             </Typography>
-            <Typography variant="body1">
-              Web application for online zoom class scheduling, personal
-              timetable view for school teachers and students. Software was
-              developed by{" "}
+            <Typography variant="body1" textAlign={"justify"}>
+              MOMENT is a web application for online zoom class scheduling for
+              teachers and personal timetable view for both teachers and
+              students. Software was developed by{" "}
               {
                 <i>
                   <b>Omega_Squad</b>
