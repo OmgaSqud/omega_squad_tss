@@ -43,12 +43,11 @@ import ConfirmDelete from "../modals/ConfirmDelete";
 import Axios from "axios";
 
 const Timetable = () => {
-  const user = useContext(AuthContext).user.userDetails;
-  // const user = {
-  //   uid: "XnH9lDsLsEWqda1B1D2ScYxGu822",
-  //   name: "Vinura Chandrasekara",
-  //   email: "vinurachan@gmail.com",
-  // };
+  // const user = useContext(AuthContext).user.userDetails;
+  const user = {
+    uid: window.localStorage.getItem("uid"),
+    name: window.localStorage.getItem("uname"),
+  };
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(2),
