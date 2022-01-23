@@ -86,13 +86,25 @@ const EditUser = () => {
   const [selectUser, setSelectUser] = useState({ name: "", uid: "" });
 
   useEffect(() => {
-    console.log("use changed " + selectUser.uid);
+    console.log("user changed " + selectUser.uid);
     // if (selectUser.uid != null) {
     //   getDoc(doc(db, "users", selectUser.uid)).then((doc) => {
     //     const data = doc.data();
     //     console.log(data);
     //   });
     // }
+    console.log("exist subject list");
+    console.log(subjects);
+    setSubjects({
+      maths: false,
+      chem: false,
+      agr: false,
+      bio: false,
+      eng: false,
+      ict: false,
+      psc: false,
+      git: false,
+    });
     getDocs(
       query(collection(db, "users"), where("uid", "==", selectUser.uid))
     ).then((query) => {
@@ -117,15 +129,127 @@ const EditUser = () => {
           ...userData,
         });
 
-        console.log("details : " + details);
+        for (var i = 0; i < userData.subjects.length; i++) {
+          if (userData.subjects[i] === "GIT") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              git: !subjects["git"],
+            }));
+          }
+          if (userData.subjects[i] === "ICT") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              ict: !subjects["ict"],
+            }));
+          }
+          if (userData.subjects[i] === "Maths") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              maths: !subjects["maths"],
+            }));
+          }
+          if (userData.subjects[i] === "Aggriculture") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              agr: !subjects["agr"],
+            }));
+          }
+          if (userData.subjects[i] === "Chemistry") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              chem: !subjects["chem"],
+            }));
+          }
+          if (userData.subjects[i] === "Biology") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              bio: !subjects["bio"],
+            }));
+          }
+          if (userData.subjects[i] === "English") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              eng: !subjects["eng"],
+            }));
+          }
+          if (userData.subjects[i] === "Physics") {
+            setSubjects((subjects) => ({
+              ...subjects,
+              psc: !subjects["psc"],
+            }));
+          }
+        }
+        console.log(subjects);
+        console.log(details);
       });
     });
   }, [selectUser]);
 
+  //checkboxes
+  const [subjects, setSubjects] = useState({
+    maths: false,
+    chem: false,
+    agr: false,
+    bio: false,
+    eng: false,
+    ict: false,
+    psc: false,
+    git: false,
+  });
+
+  const setArray = (e) => {
+    // subjects.forEach((element) => {
+    //   setDetails((details) => ({ ...details.subjects.push(element) }));
+    // });
+    setDetails((details) => ({
+      ...details,
+      subjects: [],
+    }));
+    if (subjects.maths) {
+      details.subjects.push("Maths");
+    }
+    if (subjects.agr) {
+      details.subjects.push("Aggriculture");
+    }
+    if (subjects.bio) {
+      details.subjects.push("Biology");
+    }
+    if (subjects.chem) {
+      details.subjects.push("Chemistry");
+    }
+    if (subjects.eng) {
+      details.subjects.push("English");
+    }
+    if (subjects.git) {
+      details.subjects.push("GIT");
+    }
+    if (subjects.ict) {
+      details.subjects.push("ICT");
+    }
+    if (subjects.psc) {
+      details.subjects.push("Physics");
+    }
+  };
+
+  const setSubjectValue = (e) => {
+    setSubjects((subjects) => ({
+      ...subjects,
+      [e.target.name]: !subjects[e.target.name],
+    }));
+    setArray();
+    console.log(details);
+  };
+
+  //===================================
+
   const handleUpdate = () => {
+    console.log(details);
+    setArray();
+    console.log(details);
     updateDoc(doc(db, "users", selectUser.uid), {
       ...details,
     });
+    clear();
   };
 
   return (
@@ -379,10 +503,9 @@ const EditUser = () => {
                               <Checkbox
                                 name="maths"
                                 id="maths"
-                                value="Com.Maths"
-                                checked={
-                                  details.subjects.indexOf("Com.Maths") > -1
-                                }
+                                value="Maths"
+                                checked={subjects.maths}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="Com.Maths"
@@ -394,9 +517,8 @@ const EditUser = () => {
                                 name="chem"
                                 id="chem"
                                 value="Chemistry"
-                                checked={
-                                  details.subjects.indexOf("Chemistry") > -1
-                                }
+                                checked={subjects.chem}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="Chemistry"
@@ -406,13 +528,12 @@ const EditUser = () => {
                               <Checkbox
                                 name="agr"
                                 id="agr"
-                                value="Agriculture"
-                                checked={
-                                  details.subjects.indexOf("Agriculture") > -1
-                                }
+                                value="Aggriculture"
+                                checked={subjects.agr}
+                                onClick={setSubjectValue}
                               />
                             }
-                            label="Agriculture"
+                            label="Aggriculture"
                           />
                         </FormGroup>
                       </Grid>
@@ -424,9 +545,8 @@ const EditUser = () => {
                                 name="bio"
                                 id="bio"
                                 value="Biology"
-                                checked={
-                                  details.subjects.indexOf("Biology") > -1
-                                }
+                                checked={subjects.bio}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="Biology"
@@ -437,9 +557,8 @@ const EditUser = () => {
                                 name="eng"
                                 id="eng"
                                 value="English"
-                                checked={
-                                  details.subjects.indexOf("English") > -1
-                                }
+                                checked={subjects.eng}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="English"
@@ -450,7 +569,8 @@ const EditUser = () => {
                                 name="ict"
                                 id="ict"
                                 value="ICT"
-                                checked={details.subjects.indexOf("ICT") > -1}
+                                checked={subjects.ict}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="ICT"
@@ -465,9 +585,8 @@ const EditUser = () => {
                                 name="psc"
                                 id="psc"
                                 value="Physics"
-                                checked={
-                                  details.subjects.indexOf("Physics") > -1
-                                }
+                                checked={subjects.psc}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="Physics"
@@ -478,7 +597,8 @@ const EditUser = () => {
                                 name="git"
                                 id="git"
                                 value="GIT"
-                                checked={details.subjects.indexOf("GIT") > -1}
+                                checked={subjects.git}
+                                onClick={setSubjectValue}
                               />
                             }
                             label="GIT"
@@ -506,16 +626,6 @@ const EditUser = () => {
 
               <Button
                 variant="contained"
-                sx={{ width: "100px", marginLeft: "10vh" }}
-                onClick={() => {
-                  console.log(details.subjects);
-                }}
-              >
-                Test
-              </Button>
-
-              <Button
-                variant="contained"
                 onClick={() => {
                   handleUpdate();
                 }}
@@ -523,6 +633,7 @@ const EditUser = () => {
                 Update
               </Button>
             </Stack>
+            <div></div>
           </Box>
         </Box>
         {/**=================================================================================================== */}
