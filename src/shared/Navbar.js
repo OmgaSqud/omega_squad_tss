@@ -53,14 +53,18 @@ const Navbar = () => {
         sx={{ backgroundColor: "#1E2A83", height: "10vh" }}
       >
         <Toolbar>
-          <img src="Logo.png" alt="" class="img-fluid" />
+          <img
+            src="Logo.jpeg"
+            alt=""
+            style={{ height: "100%", borderRadius: 50, padding: 5 }}
+          />
           <Typography
             variant="h4"
             noWrap
             component="div"
             sx={{ display: { xs: "none", sm: "block" }, marginLeft: "5%" }}
           >
-            MOMENT
+            VirtuaClass
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           {location.pathname === "/" || location.pathname === "/about" ? (

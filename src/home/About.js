@@ -24,7 +24,7 @@ export default function BasicCard() {
               About
             </Typography>
             <Typography variant="body1" textAlign={"justify"}>
-              MOMENT is a web application for online zoom class scheduling for
+              VirtuaClass is a web application for online zoom class scheduling for
               teachers and personal timetable view for both teachers and
               students. Software was developed by{" "}
               {
