@@ -381,6 +381,7 @@ const Timetable = () => {
             width: 150,
             fontSize: 20,
             fontWeight: "bold",
+            fontFamily: "cursive",
             fontStyle: i === 2 && !Period ? "italic" : null,
           }}
         >
@@ -398,7 +399,9 @@ const Timetable = () => {
                   ":hover": { backgroundColor: "lightskyblue" },
                 }}
               >
-                <Typography>{value.subject + "  " + value.class}</Typography>
+                <Typography sx={{ fontFamily: "cursive" }}>
+                  {value.subject + "  " + value.class}
+                </Typography>
               </Item>
             </Grid>
           ) : Period ? (
@@ -482,7 +485,12 @@ const Timetable = () => {
         >
           <DrawerHeader sx={{ justifyContent: "space-between" }}>
             <Typography
-              sx={{ color: "white", fontSize: 22, marginLeft: "30%" }}
+              sx={{
+                color: "white",
+                fontSize: 22,
+                marginLeft: "30%",
+                fontFamily: "cursive",
+              }}
             >
               Subjects
             </Typography>
@@ -518,6 +526,7 @@ const Timetable = () => {
                       sx={{
                         fontSize: 20,
                         fontWeight: "bold",
+                        fontFamily: "cursive",
                         backgroundColor: "#9C27B0",
                         width: heading === "Time" ? 130 : 150,
                       }}
@@ -534,6 +543,7 @@ const Timetable = () => {
                       align="center"
                       sx={{
                         fontWeight: "bold",
+                        fontFamily: "cursive",
                         backgroundColor: "#9C27B0",
                       }}
                     >
