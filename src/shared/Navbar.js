@@ -87,7 +87,13 @@ const Navbar = () => {
               </Typography>
               <Button
                 variant="contained"
-                sx={{ marginRight: "2vw", backgroundColor: "darkslategray" }}
+                sx={{
+                  marginRight: "2vw",
+                  backgroundColor: "#E91E63",
+                  "&:hover": {
+                    backgroundColor: "#BE134C",
+                  },
+                }}
                 onClick={signOut}
               >
                 {loading ? "Logging out.." : "Logout"}

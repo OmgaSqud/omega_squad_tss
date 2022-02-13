@@ -377,7 +377,7 @@ const Timetable = () => {
         <TableCell
           align="center"
           sx={{
-            backgroundColor: !Period ? "#8CD4CD" : null,
+            backgroundColor: !Period ? "#9C27B0" : null,
             width: 150,
             fontSize: 20,
             fontWeight: "bold",
@@ -440,7 +440,7 @@ const Timetable = () => {
         <AppBar
           position="fixed"
           open={open}
-          sx={{ top: "10vh", backgroundColor: "#b6c1bf", color: "black" }}
+          sx={{ top: "10vh", backgroundColor: "#444444", color: "black" }}
         >
           <Toolbar>
             <IconButton
@@ -452,7 +452,14 @@ const Timetable = () => {
             >
               <ChevronRightIcon />
             </IconButton>
-            <Typography variant="h4" noWrap component="div" fontWeight="bold">
+            <Typography
+              variant="h4"
+              noWrap
+              component="div"
+              fontWeight="bold"
+              color={"#fff"}
+              fontFamily={"cursive"}
+            >
               My Timetable
             </Typography>
           </Toolbar>
@@ -466,7 +473,7 @@ const Timetable = () => {
               top: "10vh",
               width: drawerWidth,
               boxSizing: "border-box",
-              backgroundColor: "#34495e",
+              backgroundColor: "#AC1145",
             },
           }}
           variant="persistent"
@@ -511,7 +518,7 @@ const Timetable = () => {
                       sx={{
                         fontSize: 20,
                         fontWeight: "bold",
-                        backgroundColor: "#8CD4CD",
+                        backgroundColor: "#9C27B0",
                         width: heading === "Time" ? 130 : 150,
                       }}
                     >
@@ -527,7 +534,7 @@ const Timetable = () => {
                       align="center"
                       sx={{
                         fontWeight: "bold",
-                        backgroundColor: "#8CD4CD",
+                        backgroundColor: "#9C27B0",
                       }}
                     >
                       {slot}
