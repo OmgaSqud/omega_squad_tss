@@ -150,7 +150,13 @@ const AddUser = () => {
 
   return (
     <Box
-      sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
+      sx={{
+        marginTop: "10vh",
+        height: "85vh",
+        width: "100vw",
+        flexGrow: 1,
+        bgcolor: "#F7EAF8",
+      }}
     >
       <div class="block" style={{ marginTop: "3vh" }}>
         <ButtonGroup
@@ -160,7 +166,12 @@ const AddUser = () => {
           aria-label="outlined button group"
         >
           <Button disabled>Add User</Button>
-          <Button onClick={() => history.push("/edit-user")}>Edit User</Button>
+          <Button
+            onClick={() => history.push("/edit-user")}
+            sx={{ color: "#E91E63" }}
+          >
+            Edit User
+          </Button>
         </ButtonGroup>
         <Box>
           <Box sx={{ padding: "20px" }}>
@@ -451,15 +462,31 @@ const AddUser = () => {
               )
             )}
 
-            <Stack spacing={40} direction="row" style={{ marginTop: "10px" }}>
+            <Stack spacing={30} direction="row" style={{ marginTop: "10px" }}>
               <Button
                 variant="contained"
-                sx={{ width: "100px", marginLeft: "10vh" }}
+                sx={{
+                  width: "100px",
+                  marginLeft: "20vh",
+                  backgroundColor: "#9C27B0",
+                  "&:hover": {
+                    backgroundColor: "#7A1E8A",
+                  },
+                }}
                 onClick={clear}
               >
                 Clear
               </Button>
-              <Button variant="contained" onClick={handleAddUser}>
+              <Button
+                variant="contained"
+                onClick={handleAddUser}
+                sx={{
+                  backgroundColor: "#9C27B0",
+                  "&:hover": {
+                    backgroundColor: "#7A1E8A",
+                  },
+                }}
+              >
                 Add User
               </Button>
             </Stack>

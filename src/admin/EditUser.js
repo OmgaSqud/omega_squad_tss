@@ -130,7 +130,13 @@ const EditUser = () => {
 
   return (
     <Box
-      sx={{ marginTop: "10vh", height: "85vh", width: "100vw", flexGrow: 1 }}
+      sx={{
+        marginTop: "10vh",
+        height: "85vh",
+        width: "100vw",
+        backgroundColor: "#F7EAF8",
+        flexGrow: 1,
+      }}
     >
       <div class="block" style={{ marginTop: "3vh" }}>
         <ButtonGroup
@@ -139,7 +145,12 @@ const EditUser = () => {
           size="large"
           aria-label="outlined button group"
         >
-          <Button onClick={() => history.push("/add-user")}>Add User</Button>
+          <Button
+            onClick={() => history.push("/add-user")}
+            sx={{ color: "#E91E63" }}
+          >
+            Add User
+          </Button>
           <Button disabled>Edit User</Button>
         </ButtonGroup>
         <Box sx={{ flexGrow: 1, padding: "20px 20px 0px 60px" }}>
@@ -492,19 +503,26 @@ const EditUser = () => {
             )}
 
             <Stack
-              spacing={40}
+              spacing={35}
               direction="row"
               style={{ marginTop: "10px", marginBottom: "10px" }}
             >
               <Button
                 variant="contained"
-                sx={{ width: "100px", marginLeft: "10vh" }}
+                sx={{
+                  width: "100px",
+                  marginLeft: "10vh",
+                  backgroundColor: "#9C27B0",
+                  "&:hover": {
+                    backgroundColor: "#7A1E8A",
+                  },
+                }}
                 onClick={clear}
               >
                 Clear
               </Button>
 
-              <Button
+              {/* <Button
                 variant="contained"
                 sx={{ width: "100px", marginLeft: "10vh" }}
                 onClick={() => {
@@ -512,12 +530,18 @@ const EditUser = () => {
                 }}
               >
                 Test
-              </Button>
+              </Button> */}
 
               <Button
                 variant="contained"
                 onClick={() => {
                   handleUpdate();
+                }}
+                sx={{
+                  backgroundColor: "#9C27B0",
+                  "&:hover": {
+                    backgroundColor: "#7A1E8A",
+                  },
                 }}
               >
                 Update

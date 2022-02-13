@@ -94,7 +94,13 @@ const StudentView = () => {
                 variant="contained"
                 href={row.joinlink}
                 target="_blank"
-                sx={{ width: "50%" }}
+                sx={{
+                  width: "50%",
+                  backgroundColor: "#9C27B0",
+                  "&:hover": {
+                    backgroundColor: "#7A1E8A",
+                  },
+                }}
               >
                 Join
               </Button>
@@ -308,7 +314,7 @@ const StudentView = () => {
         marginTop: "10vh",
         height: "85vh",
         width: "100vw",
-        bgcolor: "#D2DBEB",
+        bgcolor: "#F7EAF8",
         padding: "40px 50px",
       }}
     >
@@ -384,7 +390,14 @@ const StudentView = () => {
       <Stack spacing={2} direction="row">
         <Button
           variant="contained"
-          sx={{ margin: "auto", marginTop: "20px" }}
+          sx={{
+            margin: "auto",
+            marginTop: "20px",
+            backgroundColor: "#9C27B0",
+            "&:hover": {
+              backgroundColor: "#7A1E8A",
+            },
+          }}
           onClick={() =>
             console.log(
               rowsPerPage,
