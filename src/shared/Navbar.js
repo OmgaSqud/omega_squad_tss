@@ -56,7 +56,13 @@ const Navbar = () => {
           <img
             src="Logo.jpeg"
             alt=""
-            style={{ height: "100%", borderRadius: 50, padding: 5 }}
+            style={{
+              height: "8vh",
+              width: "8vh",
+              borderRadius: 15,
+              marginTop: 7,
+            }}
+            className="navbar_img"
           />
           <Typography
             variant="h4"

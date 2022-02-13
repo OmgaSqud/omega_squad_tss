@@ -15,7 +15,7 @@ const SubjectCard = (props) => {
       }}
     >
       <CardContent sx={{ display: "flex", justifyContent: "center" }}>
-        <Typography fontSize={18} color="black">
+        <Typography fontSize={18} color="black" fontFamily="cursive">
           {props.subject}
         </Typography>
       </CardContent>
