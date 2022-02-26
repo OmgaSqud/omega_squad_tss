@@ -20,6 +20,8 @@ import Paper from "@mui/material/Paper";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 //---------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------
@@ -85,6 +87,8 @@ const EditUser = () => {
 
   const [selectUser, setSelectUser] = useState({ name: "", uid: "" });
 
+  const [alertValue, setAlertValue] = useState(false);
+
   useEffect(() => {
     console.log("use changed " + selectUser.uid);
     // if (selectUser.uid != null) {
@@ -126,6 +130,10 @@ const EditUser = () => {
     updateDoc(doc(db, "users", selectUser.uid), {
       ...details,
     });
+    setAlertValue(true);
+    setTimeout(() => {
+      setAlertValue(false);
+    }, 2000);
   };
 
   return (
@@ -169,6 +177,7 @@ const EditUser = () => {
                     fullWidth
                     value={details.type}
                     onChange={(e) => {
+                      clear();
                       setValue(e);
                       setSearchArray([]);
                     }}
@@ -180,7 +189,7 @@ const EditUser = () => {
                 </FormControl>
               </Box>
             </Grid>
-            <Grid item xs={3}>
+            {/* <Grid item xs={3}>
               <Box sx={{ minWidth: 120, margin: "0px auto" }}>
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">Class</InputLabel>
@@ -203,19 +212,21 @@ const EditUser = () => {
                   </Select>
                 </FormControl>
               </Box>
-            </Grid>
-            <Grid item xs={6}>
+            </Grid> */}
+            <Grid item xs={8}>
               <Autocomplete
-                // value={selectUser}
+                value={selectUser.name}
                 onChange={(event, newValue) => {
                   setSelectUser(newValue);
                   console.log(newValue);
                 }}
+                key={details.type}
                 disablePortal
-                id="highlights-demo"
+                id="disable-clearable"
+                disableClearable
                 sx={{
-                  width: 200,
-                  margin: "-16px auto 0px",
+                  width: "70%",
+                  margin: "-16px 2% 0px auto",
                 }}
                 options={searchArray}
                 renderInput={(params) => (
@@ -500,6 +511,19 @@ const EditUser = () => {
                   </Box>
                 </Box>
               )
+            )}
+
+            {alertValue && (
+              <Box>
+                <Alert
+                  variant="filled"
+                  severity="success"
+                  sx={{ marginTop: "2%", width: "90%" }}
+                >
+                  {/* <AlertTitle>Success</AlertTitle> */}
+                  User updated successfully!
+                </Alert>
+              </Box>
             )}
 
             <Stack
