@@ -17,6 +17,8 @@ import Paper from "@mui/material/Paper";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 
 //-------------------------------------------------------------------------------
 import { doc, setDoc } from "firebase/firestore";
@@ -86,6 +88,10 @@ const AddUser = () => {
           });
         }
         console.log("created");
+        setAlertValue(true);
+        setTimeout(() => {
+          setAlertValue(false);
+        }, 2000);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -147,6 +153,8 @@ const AddUser = () => {
       ...subjects,
       [e.target.name]: !subjects[e.target.name],
     }));
+
+  const [alertValue, setAlertValue] = useState(false);
 
   return (
     <Box
@@ -460,6 +468,19 @@ const AddUser = () => {
                   </Box>
                 </Box>
               )
+            )}
+
+            {alertValue && (
+              <Box>
+                <Alert
+                  variant="filled"
+                  severity="success"
+                  sx={{ marginTop: "2%", marginLeft: "10%", width: "80%" }}
+                >
+                  {/* <AlertTitle>Success</AlertTitle> */}
+                  User added successfully!
+                </Alert>
+              </Box>
             )}
 
             <Stack spacing={30} direction="row" style={{ marginTop: "10px" }}>
